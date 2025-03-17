@@ -1,0 +1,1011 @@
+/* 基础布局 */
+.container {
+    display: grid;
+    grid-template-columns: 10% 15% 75%;
+    height: 100vh;
+    background: #f5f7fb;
+    gap: 15px;
+    padding: 20px;
+}
+
+/* 左侧导航优化 */
+.main-nav {
+    background: #e8f4ff; /* 清新浅蓝色 */
+    border-radius: 8px;
+    padding: 15px 20px;
+    
+    .nav-header {
+        display: none; /* 删除功能导航标题 */
+    }
+    
+    .nav-item {
+        color: #2A5C9A; /* 主蓝色 */
+        padding: 12px;
+        border-radius: 6px;
+        &:hover {
+            background: rgba(42,92,154,0.1);
+        }
+    }
+}
+
+/* 历史面板搜索框优化 */
+.history-panel {
+    .search-box {
+        width: 100%;
+        margin: 25px 0 20px 0;  /* 下移并增加间距 */
+        
+        input {
+            width: 100%;
+            padding: 14px 18px;
+            font-size: 1.05em;
+            border-radius: 25px;
+            border: 2px solid #cce0ff;
+        }
+    }
+    
+    /* 历史面板优化 */
+    .history-panel {
+        .search-box {
+            margin: 20px 0 15px 0; /* 下移搜索框位置 */
+            input {
+                padding: 12px 15px;
+                font-size: 1em; /* 放大输入文字 */
+            }
+        }
+        
+        .history-item {
+            position: relative;
+            padding-left: 30px; /* 为序号留出空间 */
+            
+            &::before {
+                content: "作文" counter(history-counter) ":";
+                counter-increment: history-counter;
+                position: absolute;
+                left: 12px;
+                top: 14px;
+                color: #999;
+                font-size: 0.85em;
+            }
+            
+            h4 {
+                margin-left: 10px;
+                &::before {
+                    content: none; /* 移除原有标题前缀 */
+                }
+            }
+        }
+    }
+}
+    
+    /* 顶部功能区 */
+    .dialog-header {
+        background: linear-gradient(90deg, #2A5C9A, #357ABD);
+        padding: 15px 20px;
+        color: white;
+        h2 {
+            font-size: 1.5em;
+            margin: 0;
+            small {
+                font-size: 0.8em;
+                color: #D3E5FF;
+            }
+        }
+    }
+    
+    /* 输入控制组 */
+    .input-toolbar {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 15px;
+        background: #F8FAFF;
+        border: 1px solid #DEEBFF;
+        
+        .input-core {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: nowrap; /* 新增防止换行 */
+            
+            /* 调整元素顺序 */
+            select.model-select {
+                order: 2; /* 将选择器移到右侧 */
+                min-width: 120px; /* 新增最小宽度 */
+            }
+            
+            .file-upload {
+                order: 1; /* 保持上传按钮原有位置 */
+                background: linear-gradient(135deg, #6B8DD6, #2A5C9A);
+                color: white;
+                padding: 8px 15px;
+            }
+            
+            #essay-topic {
+                order: 0; /* 确保输入框在最左侧 */
+                flex: 1;
+            }
+        }
+        
+        .web-search-label {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            input[type="checkbox"] {
+                accent-color: #2A5C9A;
+            }
+        }
+    }
+    
+    /* 题型分析面板 */
+    /* 在analysis-card样式后新增 */
+    /* 调整题目解析容器尺寸 */
+    .analysis-card {
+        width: 95%;
+        height: 40vh; /* 新增高度限制 */
+        overflow-y: auto; /* 添加滚动条 */
+        background: #F8FAFF;
+        border: 1px solid #DEEBFF;
+        padding: 5px;
+        .analysis-meta {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            div {
+                background: white;
+                padding: 1px;
+                border-radius: 6px;
+            }
+        }
+        
+        .case-study-2023 {
+            background: #fff8e1;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 20px 0;
+            h3 {
+                color: #2A5C9A;
+                small {
+                    font-size: 0.8em;
+                    color: #666;
+                }
+            }
+        }
+    }
+    .history-item {
+        padding: 10px;
+        font-size: 0.9em;
+        time {
+            display: block;
+            color: #666;
+            font-size: 0.8em;
+        }
+    }
+}
+
+/* 新版输入工具栏 */
+.input-toolbar {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    gap: 10px;
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    
+    .model-selector {
+        display: flex;
+        gap: 5px;
+        button {
+            padding: 8px 12px;
+            &.active {
+                background: #6B8DD6;
+                color: white;
+            }
+        }
+    }
+}
+
+/* 智能问答流程 */
+.dialog-process {
+    display: grid;
+    grid-template-columns: repeat(10, 1fr); /* 10轮问答进度 */
+    gap: 5px;
+    margin: 20px 0;
+    
+    .step {
+        height: 4px;
+        background: #ddd;
+        &.active {
+            background: #6B8DD6;
+        }
+    }
+}
+
+/* 调整输入区域定位 */
+.input-container {
+    position: sticky;
+    bottom: 0;
+    background: white;
+    padding: 20px;
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+}
+
+/* 新增案例展示样式 */
+.case-study {
+    margin: 20px;
+    padding: 15px;
+    border: 1px solid #6B8DD6;
+    border-radius: 8px;
+    h4 {
+        color: #2c3e50;
+        margin-bottom: 10px;
+    }
+}
+
+.function-area {
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+/* 输入区域 */
+.input-toolbar {
+    display: flex;
+    gap: 10px;
+    margin: 20px 0;
+}
+
+#essay-topic {
+    flex: 1;
+    padding: 12px;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+}
+
+.file-upload {
+    background: #f8f9fa;
+    padding: 12px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+/* 流程指示器 */
+.socratic-flow {
+    display: flex;
+    justify-content: space-between;
+    margin: 20px 0;
+}
+
+.flow-step {
+    flex: 1;
+    text-align: center;
+    padding: 10px;
+    border-bottom: 3px solid #ddd;
+    &.active {
+        border-color: #6B8DD6;
+    }
+}
+
+/* 主容器布局调整 */
+.container {
+    grid-template-columns: 10% 15% 75%; /* 三栏比例调整 */
+    gap: 2px; /* 减少间隙保证比例准确 */
+}
+
+/* 左侧导航栏 */
+.main-nav {
+    background: #2A5C9A; /* 主蓝色 */
+    border-radius: 0; /* 去除圆角 */
+    padding: 15px 10px;
+    
+    .nav-item {
+        color: white;
+        padding: 12px 8px;
+        margin: 6px 0;
+        &:hover {
+            background: rgba(255,255,255,0.15);
+        }
+    }
+}
+
+/* 中间历史面板 */
+.history-panel {
+    background: #E8F4FF; /* 更新为清新浅蓝 */
+    padding: 10px;
+    
+    .search-box input {
+        border-color: #B3D4FF; /* 调整为浅蓝色边框 */
+        background: white; /* 纯白背景提升对比度 */
+    }
+    
+    .history-item {
+        background: rgba(255,255,255,0.9); /* 半透明白色背景 */
+        border-radius: 6px;
+        margin: 8px 0;
+    }
+}
+
+/* 右侧工作区微调 */
+.function-area {
+    background: linear-gradient(135deg, #f5fbff 0%, #ebf3ff 100%);
+    box-shadow: inset 3px 0 6px rgba(0,0,0,0.03);
+}
+    background: linear-gradient(135deg, #f5fbff 0%, #ebf3ff 100%);
+}
+
+/* 输入工具栏重构 */
+.input-toolbar {
+    display: flex;
+    gap: 10px;
+    margin: 20px 0;
+}
+
+#essay-topic {
+    flex: 1;
+    padding: 12px;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+}
+
+.file-upload {
+    background: #f8f9fa;
+    padding: 12px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+/* 流程指示器 */
+.socratic-flow {
+    display: flex;
+    justify-content: space-between;
+    margin: 20px 0;
+}
+
+.flow-step {
+    flex: 1;
+    text-align: center;
+    padding: 10px;
+    border-bottom: 3px solid #ddd;
+    &.active {
+        border-color: #6B8DD6;
+    }
+}
+
+/* 主容器布局调整 */
+.container {
+    grid-template-columns: 10% 15% 75%; /* 三栏比例调整 */
+    gap: 2px; /* 减少间隙保证比例准确 */
+}
+
+/* 左侧导航栏 */
+.main-nav {
+    background: #2A5C9A; /* 主蓝色 */
+    border-radius: 0; /* 去除圆角 */
+    padding: 15px 10px;
+    
+    .nav-item {
+        color: white;
+        padding: 12px 8px;
+        margin: 6px 0;
+        &:hover {
+            background: rgba(255,255,255,0.15);
+        }
+    }
+}
+
+/* 中间历史面板 */
+.history-panel {
+    background: #E8F4FF; /* 更新为清新浅蓝 */
+    padding: 10px;
+    
+    .search-box input {
+        border-color: #B3D4FF; /* 调整为浅蓝色边框 */
+        background: white; /* 纯白背景提升对比度 */
+    }
+    
+    .history-item {
+        background: rgba(255,255,255,0.9); /* 半透明白色背景 */
+        border-radius: 6px;
+        margin: 8px 0;
+    }
+}
+
+/* 右侧工作区微调 */
+.function-area {
+    background: linear-gradient(135deg, #f5fbff 0%, #ebf3ff 100%);
+    box-shadow: inset 3px 0 6px rgba(0,0,0,0.03);
+}
+    background: linear-gradient(135deg, #f5fbff 0%, #ebf3ff 100%);
+}
+
+/* 输入工具栏重构 */
+.input-toolbar {
+    /* 顶部标题样式 */
+    .dialog-header {
+        padding: 20px 0;
+        .main-title {
+            color: #2A5C9A;
+            font-size: 1.8em;
+            margin-bottom: 8px;
+        }
+        .sub-title {
+            color: #666;
+            font-size: 0.9em;
+            display: block;
+        }
+    }
+    
+    /* 输入工具栏增强 */
+    .input-toolbar {
+        .file-upload {
+            background: linear-gradient(135deg, #6B8DD6, #2A5C9A);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            transition: opacity 0.3s;
+            &:hover {
+                opacity: 0.9;
+            }
+        }
+        
+        .btn-analyze {
+            background: #2A5C9A;
+            padding: 12px 30px;
+            margin-left: auto; /* 右对齐 */
+            &:disabled {
+                background: #B3D4FF;
+                cursor: not-allowed;
+            }
+        }
+    }
+    
+    /* 大纲生成器优化 */
+    .framework-suggestion {
+        margin: 15px 0;
+        .framework-tag {
+            background: rgba(42,92,154,0.1);
+            color: #2A5C9A;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.9em;
+        }
+        ul {
+            padding-left: 25px;
+            li {
+                margin: 10px 0;
+                &::marker {
+                    color: #6B8DD6;
+                }
+            }
+        }
+    }
+    
+    .outline-input-group {
+        position: relative;
+        textarea {
+            font-size: 0.95em;
+            padding: 15px;
+            border: 2px solid #E8F4FF;
+            &:focus {
+                border-color: #B3D4FF;
+            }
+        }
+        .btn-request {
+            position: absolute;
+            bottom: 15px;
+            right: 15px;
+            padding: 8px 20px;
+        }
+    }
+    
+    /* 历史数据可视化 */
+    .frequency-progress {
+        height: 8px;
+        background: #E8F4FF;
+        border-radius: 4px;
+        .progress-bar {
+            width: 30%;
+            background: #6B8DD6;
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+    }
+    
+    /* 悬浮提示 */
+    [data-tooltip] {
+        position: relative;
+        &:hover::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            white-space: nowrap;
+        }
+    }
+    /* 输入工具栏重构 */
+    .input-toolbar {
+        display: flex;
+        gap: 10px; /* 减少间隙 */
+        align-items: stretch; /* 元素等高 */
+        padding: 8px 15px; /* 紧凑内边距 */
+    
+        .input-group {
+            flex-grow: 1; /* 强化扩展能力 */
+            gap: 8px;
+            select {
+                width: 140px; /* 修正错误宽度值（原440px过宽） */
+                order: -1;     /* 确保选择器顺序生效 */
+            }
+            #essay-topic {
+                min-width: 480px; /* 还原合理宽度 */
+            }
+        }
+    
+        .tool-group {
+            /* 添加弹性容器声明 */
+            display: flex;
+            gap: 15px;
+            .web-search-label { 
+                order: 1;
+                /* 新增对齐修正 */
+                display: flex;
+                align-items: center; 
+            }
+            button.btn-analyze {
+                order: 2;
+                background: #2A5C9A;
+                /* 添加过渡效果 */
+                transition: background 0.3s ease;
+                &:hover {
+                    background: #1E477A;
+                }
+            }
+        }
+    }
+    
+    .input-group {
+        flex: 1;
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        
+        select {
+            padding: 8px 12px;
+            border: 1px solid #dde5f0;
+            border-radius: 6px;
+            background: white;
+        }
+    }
+    
+    /* 新增按钮容器样式 */
+    .tool-group {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        margin-left: auto; /* 将按钮组推到最右侧 */
+    }
+
+    button {
+        padding: 10px 25px; /* 加宽按钮 */
+        white-space: nowrap; /* 防止文字换行 */
+        background: #6B8DD6;
+        color: white;
+        border-radius: 6px;
+        border: none;
+    }
+}
+
+#essay-topic {
+    flex: 1;
+    min-width: 300px; /* 最小宽度保障 */
+    padding: 12px;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+}
+
+.file-upload {
+    background: #f8f9fa;
+    padding: 12px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+/* 流程指示器 */
+.socratic-flow {
+    display: flex;
+    justify-content: space-between;
+    margin: 20px 0;
+}
+
+.flow-step {
+    flex: 1;
+    text-align: center;
+    padding: 10px;
+    border-bottom: 3px solid #ddd;
+    &.active {
+        border-color: #6B8DD6;
+    }
+}
+
+/* 主容器布局调整 */
+.container {
+    grid-template-columns: 10% 15% 75%; /* 三栏比例调整 */
+    gap: 2px; /* 减少间隙保证比例准确 */
+}
+
+/* 左侧导航栏 */
+.main-nav {
+    background: #2A5C9A; /* 主蓝色 */
+    border-radius: 0; /* 去除圆角 */
+    padding: 15px 10px;
+    
+    .nav-item {
+        color: white;
+        padding: 12px 8px;
+        margin: 6px 0;
+        &:hover {
+            background: rgba(255,255,255,0.15);
+        }
+    }
+}
+
+/* 中间历史面板 */
+.history-panel {
+    background: #E8F4FF; /* 更新为清新浅蓝 */
+    padding: 10px;
+    
+    .search-box input {
+        border-color: #B3D4FF; /* 调整为浅蓝色边框 */
+        background: white; /* 纯白背景提升对比度 */
+    }
+    
+    .history-item {
+        background: rgba(255,255,255,0.9); /* 半透明白色背景 */
+        border-radius: 6px;
+        margin: 8px 0;
+    }
+}
+
+/* 右侧工作区微调 */
+.function-area {
+    background: linear-gradient(135deg, #f5fbff 0%, #ebf3ff 100%);
+    box-shadow: inset 3px 0 6px rgba(0,0,0,0.03);
+}
+    background: linear-gradient(135deg, #f5fbff 0%, #ebf3ff 100%);
+}
+
+/* 输入工具栏重构 */
+.input-toolbar {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    background: rgba(255,255,255,0.95);
+    border: 1px solid #dde5f0;
+    border-radius: 12px;
+    padding: 12px;
+    margin-bottom: 20px;
+
+    .input-group {
+        flex: 1;
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        
+        select {
+            padding: 8px 12px;
+            border: 1px solid #dde5f0;
+            border-radius: 6px;
+            background: white;
+        }
+    }
+    
+    button {
+        padding: 10px 20px;
+        background: #6B8DD6;
+        color: white;
+        border-radius: 6px;
+        border: none;
+    }
+}
+
+/* 对话消息系统 */
+/* 在dialog-messages后新增消息样式 */
+.dialog-messages {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    min-height: 400px;
+    max-height: 60vh;
+    overflow-y: auto;
+    
+    .message {
+        margin: 10px 0;
+        padding: 12px;
+        border-radius: 8px;
+        
+        &.user {
+            background: #f5f8ff;
+            margin-left: 20%;
+        }
+        
+        &.assistant {
+            background: white;
+            border: 1px solid #eee;
+            margin-right: 20%;
+        }
+    }
+    
+    .message.system {
+        background: #e3f2fd;
+        border-color: #bbdefb;
+        .message-header::before {
+            content: "📌";
+            margin-right: 5px;
+        }
+    }
+}
+.history-item {
+    display: flex;
+    padding: 12px;
+    border-bottom: 1px solid #eee;
+    
+    .history-meta {
+        flex: 1;
+        h4 {
+            margin: 0 0 5px 0;
+            font-size: 0.95em;
+        }
+        .type-time {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+    }
+}
+
+/* 题型解析模块标题 */
+.analysis-card {
+    position: relative;
+    &::before {
+        content: "题目解析";
+        color: #2A5C9A;
+        font-size: 1.2em;
+        font-weight: 500;
+        margin-bottom: 15px;
+        display: block;
+    }
+}
+
+/* 案例样式优化 */
+.case-study-2023 {
+    h3 {
+        color: #666 !important;
+        small {
+            color: #999 !important;
+        }
+    }
+    
+    .case-content {
+        color: #777;
+        p {
+            margin: 8px 0;
+        }
+    }
+    
+    .outline-sample {
+        h4 {
+            color: #444;
+            font-size: 0.95em;
+        }
+    }
+}
+
+/* 输入工具栏并列布局 */
+.input-toolbar .tool-group {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+/* 题目解析标题样式 */
+.module-title {
+    color: #2A5C9A;
+    font-size: 1.2em;
+    font-weight: 600;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #E8F4FF;
+    margin-bottom: 15px;
+}
+
+/* 删除重复标题样式 */
+.analysis-card::before {
+    content: none !important;
+}
+
+/* 调整大纲生成模块 */
+.outline-generator {
+    margin-top: 25px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    
+    .dialog-messages {
+        min-height: 200px;
+        max-height: 40vh;
+        margin-bottom: 15px;
+    }
+    
+    .outline-input-group {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 12px;
+        
+        .outline-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+        }
+    }
+}
+    
+    .btn-request {
+        background: #6B8DD6;
+        color: white;
+        padding: 12px 25px;
+    }
+}
+
+/* 更新模块标题样式 */
+.module-header {
+    margin-bottom: 25px;
+    h3 {
+        color: #2A5C9A;
+        font-size: 1.4em;
+        small {
+            font-size: 0.85em;
+            color: #6B8DD6;
+            &::before {
+                content: "（";
+            }
+            &::after {
+                content: "）";
+            }
+        }
+    }
+}
+
+/* 动态信息展示样式 */
+.analysis-meta {
+    display: flex;
+    gap: 30px;
+    margin-bottom: 25px;
+    
+    .meta-item {
+        flex: 1;
+        padding: 15px;
+        background: rgba(234, 242, 255, 0.3);
+        border-radius: 8px;
+        
+        h4 {
+            color: #444;
+            font-size: 1.1em;
+            margin-bottom: 8px;
+        }
+        
+        .type-confidence {
+            color: #6B8DD6;
+            font-size: 0.9em;
+            &::before {
+                content: "可信度：";
+                color: #999;
+            }
+        }
+    }
+}
+
+/* 进度条样式 */
+.frequency-progress {
+    height: 8px;
+    background: #E8F4FF;
+    border-radius: 4px;
+    margin: 15px 0;
+    
+    .progress-bar {
+        width: 30%;
+        height: 100%;
+        background: #6B8DD6;
+        border-radius: 4px;
+        transition: width 0.5s ease;
+    }
+}
+
+/* 相关真题标签 */
+.related-tags {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    
+    .tag-item {
+        background: rgba(107, 141, 214, 0.1);
+        color: #2A5C9A;
+        padding: 6px 12px;
+        border-radius: 15px;
+        cursor: pointer;
+        transition: all 0.3s;
+        
+        &:hover {
+            background: #6B8DD6;
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        &::before {
+            content: "《";
+        }
+        &::after {
+            content: "》";
+        }
+    }
+}
+
+// ... 保持原有核心观点和解析逻辑样式不变 ...
+/* 在原有.analysis-card样式中添加 */
+.meta-item {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+    
+    .frequency {
+        color: #6B8DD6;
+        font-size: 0.9em;
+        margin-left: auto;
+        .progress-bar {
+            width: 80px;
+            height: 4px;
+            background: #E8F4FF;
+            .progress-track {
+                background: #2A5C9A;
+                height: 100%;
+            }
+        }
+    }
+}
+
+.framework-section {
+    background: #F8FAFF;
+    border: 1px solid #DEEBFF;
+    border-radius: 8px;
+    padding: 15px;
+    margin: 20px 0;
+    
+    h5 {
+        color: #2A5C9A;
+        margin: 0 0 10px 0;
+        .tip-icon {
+            margin-left: 5px;
+        }
+    }
+    
+    .framework-steps {
+        list-style: none;
+        padding: 0;
+        li {
+            padding: 10px;
+            margin: 8px 0;
+            background: white;
+            border-left: 3px solid #6B8DD6;
+            &:nth-child(2) {
+                border-color: #8DA8D9;
+            }
+            &:nth-child(3) {
+                border-color: #B2C8EB;
+            }
+        }
+    }
+}

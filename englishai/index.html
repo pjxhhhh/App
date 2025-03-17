@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>AI考研作文助手</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- 左侧导航 (20%) -->
+        <nav class="main-nav">
+            <div class="nav-header">功能导航</div>
+            <ul>
+                <li class="nav-item active" data-target="analysis">📑 题型解析</li>
+                <li class="nav-item" data-target="workspace">🖋️ 作文编辑</li>
+                <li class="nav-item" data-target="notes">📚 我的笔记</li>
+            </ul>
+        </nav>
+
+        <!-- 中间历史记录 (20%) -->
+        <!-- 修改后的历史面板结构 -->
+        <aside class="history-panel">
+            <div class="search-box">
+                <input type="search" placeholder="🔍 搜索历史作文..." 
+                       style="font-size: 1.1em"> <!-- 放大搜索框 -->
+            </div>
+            <ul class="history-list">
+                <li class="history-item">
+                    <div class="history-meta">
+                        <h4>在线教育发展研究</h4>
+                        <div class="type-time">
+                            <span class="type-tag">利弊分析类</span>
+                            <time>2024-03-14 09:45</time>
+                        </div>
+                    </div>
+                </li>
+                <li class="history-item">
+                    <div class="history-meta">
+                        <h4>城市公园建设分析</h4>
+                        <div class="type-time">
+                            <span class="type-tag">现象描述类</span>
+                            <time>2024-03-15 14:30</time>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </aside>
+
+        <!-- 右侧主功能 (60%) -->
+        <main class="function-area">
+            <!-- 题型解析模块 -->
+            <!-- 在function-area内更新 -->
+            <!-- 更新后的agent对话区域 -->
+            <section class="analysis-module active-module">
+                <!-- 更新顶部功能区 -->
+                <header class="dialog-header">
+                    <h2 class="main-title">Hi~ 我是你的考研英语智能助手
+                        <small class="sub-title">专业提供题型解析/大纲生成/范文指导</small>
+                    </h2>
+                </header>
+                
+                <!-- 增强型输入工具栏 -->
+                <div class="input-toolbar">
+                    <div class="input-core">
+                        <select class="model-select">
+                            <option>DeepSeek</option>
+                            <option>通义千问</option>
+                        </select>
+                        <input type="text" id="essay-topic" placeholder="请输入作文题目或上传图片...">
+                        <label class="file-upload">
+                            📷 上传/拍照
+                            <input type="file" accept="image/*" capture hidden>
+                        </label>
+                    </div>
+                    
+                    <div class="tool-group">
+                        <label class="web-search-label">
+                            <input type="checkbox"> 
+                            <span class="search-icon">🔍</span> 联网搜索
+                        </label>
+                        <button class="btn-analyze">开始解析</button>
+                    </div>
+                </div>
+                
+                <!-- 增强型题型分析面板 -->
+                <!-- 在analysis-card顶部添加标题 -->
+                <!-- 在analysis-card下方新增大纲生成模块 -->
+                <!-- 删除手动添加的模块标题 -->
+                <!-- 修改后的题型解析模块 -->
+                <!-- 更新后的题目解析模块结构 -->
+                <div class="analysis-card">
+                    <div class="module-header">
+                        <h3>题型分析</h3>
+                    </div>
+                    
+                    <div class="analysis-meta">
+                        <div class="meta-item">
+                            <h4>题目：2024年城市绿化发展报告</h4>
+                            <span class="type-tag">题目类型：图表作文社会现象类</span>
+                            <span class="frequency">历史出现频率：85%
+                                <div class="progress-bar">
+                                    <div class="progress-track" style="width: 85%"></div>
+                                </div>
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- 新增写作框架 -->
+                    <div class="framework-section">
+                        <h5>推荐框架结构 <span class="tip-icon">📝</span></h5>
+                        <ul class="framework-steps">
+                            <li>1. 图表描述（建议120词）<br>数据趋势分析+关键指标提取</li>
+                            <li>2. 原因探究（建议180词）<br>政策驱动/公众意识/技术革新</li>
+                            <li>3. 展望建议（建议100词）<br>可持续发展路径</li>
+                        </ul>
+                    </div>
+                
+                    <!-- 新增范文展示网格 -->
+                    <!-- 在.essay-grid容器中添加 -->
+                    <div class="essay-grid">
+                        <div class="essay-card">
+                            <h6>作文1：2024年全球碳排放趋势分析（图表作文）</h6>
+                            <p>基于IEA能源报告数据，分析近十年碳排放变化趋势及影响因素...</p>
+                        </div>
+                        <div class="essay-card">
+                            <h6>作文2：人工智能对教育公平的影响（议论文）</h6>
+                            <p>讨论AI技术在教育资源分配中的双刃剑作用，需包含实证案例...</p>
+                        </div>
+                        <div class="essay-card">
+                            <h6>作文3：城市化进程中的文化遗产保护（解决方案型）</h6>
+                            <p>针对亚洲城市发展现状，提出传统建筑保护与现代化建设的平衡方案...</p>
+                        </div>
+                    </div>
+                
+                    <!-- 相关真题标签容器 -->
+                    <div class="related-tags">
+                        <span class="tag-item">2023-英语一</span>
+                        <span class="tag-item">2021-英语二</span>
+                        <span class="tag-item">2019-联考</span>
+                    </div>
+                </div>
+                
+                <!-- 更新后的大纲生成模块 -->
+                <div class="outline-generator">
+                    <div class="dialog-messages" id="outlineChat">
+                        <div class="message assistant">
+                            <div class="message-header">📝 大纲助手</div>
+                            <div class="message-content">
+                                <p>围绕《题目：城市绿化发展》，你可以从以下角度思考：</p>
+                                <div class="framework-suggestion">
+                                    <span class="framework-tag">三段式结构</span>
+                                    <ul>
+                                        <li>描述图表（建议字数：80-100词）</li>
+                                        <li>分析社会影响因素</li>
+                                        <li>总结发展趋势</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="input-toolbar outline-input-group">
+                        <textarea placeholder="请输入你认为重要的观点..." 
+                                  class="outline-input" 
+                                  rows="3"></textarea>
+                        <button class="btn-request">保存草稿</button>
+                    </div>
+                </div>
+                
+                <!-- 在dialog-messages中添加系统消息 -->
+                <div class="dialog-messages" id="chatHistory">
+                    <div class="message system">
+                        <div class="message-header">系统推荐</div>
+                        <div class="message-content">
+                            已为您匹配<span class="highlight">3篇</span>相似真题范文，
+                            <a href="#" class="text-link">点击查看</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 对话交互区 -->
+                <div class="dialog-messages" id="chatHistory">
+                    <div class="message assistant">
+                        <div class="message-header">🤖 助手</div>
+                        <div class="message-content">请描述您需要分析的作文题目...</div>
+                    </div>
+                </div>
+                
+                <!-- 用户输入区 -->
+                <div class="message-input">
+                    <textarea placeholder="请输入你的回答..."></textarea>
+                    <button class="btn-send">发送</button>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- 优化对比弹窗 -->
+    <div class="optimize-modal">
+        <!-- ... 保持原有弹窗结构不变 ... -->
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
