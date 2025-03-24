@@ -81,6 +81,21 @@ initialization_promote = '''作为考研英语写作专家，请按以下步骤�
    - 学术化升级：将口语化表达替换为学术词汇（如把important→paramount）
 5. **语言提升建议**'''
 
+# 在初始化提示词之后添加大纲生成提示
+outline_promote = '''作为考研英语写作专家，请根据以下题目生成标准的三段式或四段式作文大纲：
+1. 结构要求：
+   - 三段式：现象描述→原因分析→结论建议
+   - 四段式：引入背景→正反论证→案例支撑→总结升华
+2. 每段需包含：
+   - 核心功能定位（如：数据呈现/理论论证）
+   - 建议字数范围（例：80-120词）
+   - 2-3个学术表达示范
+3. 格式要求：
+   - 使用Markdown列表格式
+   - 段首用🔹符号标注
+   - 关键术语加粗'''
+
+
 anaylyze_promote = '''作为考研英语写作专家，请针对上面的题目就以下用户的提问或者疑惑进行引导性思考: {}。
 可以基于用户的问题抛出一些问题或者想法来引导用户自主分析，以帮助用户更好地理解题目。
 请注意你需要在最多十论对话内完成,当前是第{}轮。'''
@@ -102,7 +117,7 @@ def insert_message(user_id, role, chat_num, request_content, response_content):
         chat_num=chat_num,
         request_content=request_content,
         response_content=response_content,
-        # timestamp=datetime.utcnow()
+        timestamp=datetime.now()
     )
     db.session.add(message)
     db.session.commit()
@@ -177,6 +192,56 @@ def analyze_topic():
             'data': {
                 'step': 2,
                 'analysis': response.output.text
+            }
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+# 添加新的路由端点
+@app.route('/outline', methods=['POST'])
+def generate_outline():
+    if request.headers.get('Content-Type') != 'application/json':
+        return jsonify({'error': 'Unsupported Media Type'}), 415
+
+    data = request.get_json()
+    if not data:
+        return jsonify({'error': 'Missing data'}), 400
+
+    # 参数验证
+    topic = data.get('topic')
+    user_name = data.get('user_name')
+    if not all([topic, user_name]):
+        return jsonify({'error': 'Missing required parameters'}), 400
+
+    # 用户验证
+    user = User.query.filter_by(username=user_name).first()
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+
+    try:
+        # 调用DeepSeek API
+        response = Generation.call(
+            model='qwen-turbo',
+            messages=[
+                {"role": "system", "content": outline_promote},
+                {"role": "user", "content": topic}
+            ]
+        )
+
+        # 保存生成结果
+        insert_message(user.id, 'assistant', 0, topic, response.output.text)
+
+        return jsonify({
+            'status_code': response.status_code,
+            'request_id': response.request_id,
+            'usage': {
+                'input_tokens': response.usage.input_tokens,
+                'output_tokens': response.usage.output_tokens,
+                'total_tokens': response.usage.total_tokens
+            },
+            'data': {
+                'outline': response.output.text,
+                'structure_type': '三段式' if '三段' in response.output.text else '四段式'
             }
         })
     except Exception as e:
@@ -402,12 +467,6 @@ def message_operations(message_id):
     db.session.commit()
     return jsonify({'message': '消息已删除'})
 
-@app.route('/generate', methods=['POST'])
-def generate_outline():
-    data = request.json
-    return jsonify({
-        'outline': '1. Introduction\n2. Analysis\n3. Examples\n4. Conclusion'
-    })
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
