@@ -102,7 +102,7 @@ def insert_message(user_id, role, chat_num, request_content, response_content):
         chat_num=chat_num,
         request_content=request_content,
         response_content=response_content,
-        timestamp=datetime.utcnow()
+        # timestamp=datetime.utcnow()
     )
     db.session.add(message)
     db.session.commit()
@@ -201,15 +201,15 @@ def analyze():
     if not user_name:
         return jsonify({'error': 'Missing user_name parameter'}), 400
     
-    # 检查用户是否存在，不存在则报错
+    # 修正点：通过查询获取用户对象
     user = User.query.filter_by(username=user_name).first()
     if not user:
         return jsonify({'error': 'User not found: {}'.format(user_name)}), 404
-    user_id = data['user_id']
+    user_id = user.id  # 正确获取标量用户ID
 
     # 创建新消息记录
     new_message = Message(
-        user_id=user_id,
+        user_id=user_id,  # 使用标量值
         role='user',
         request_content=data['message'],
         response_content='',
@@ -218,6 +218,7 @@ def analyze():
     db.session.add(new_message)
     db.session.commit()
 
+    # 修正点：确保获取的是整型数值
     current_chat_num = get_user_message_max_chat_num(user_id) + 1
     tmp_content = anaylyze_promote.format(message, current_chat_num)
 
@@ -264,6 +265,66 @@ def analyze():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+# 提供/optimize接口，对用户的每一个段落进行优化，并给出有效建议
+@app.route('/optimize', methods=['POST'])
+def optimize():
+    if request.headers.get('Content-Type') != 'application/json':
+        return jsonify({'error': 'Unsupported Media Type: Content-Type must be application/json'}), 415
+
+    data = request.get_json()
+    if not data:
+        return jsonify({'error': 'Missing data'}), 400
+
+    # 获取用户提供的段落
+    paragraph = data.get('paragraph')
+    if not paragraph:
+        return jsonify({'error': 'Missing paragraph parameter'}), 400
+
+    # 检查用户是否存在
+    user_name = data.get('user_name')
+    if not user_name:
+        return jsonify({'error': 'Missing user_name parameter'}), 400
+
+    # 检查用户是否存在，不存在则报错
+    user = User.query.filter_by(username=user_name).first()
+    if not user:
+        return jsonify({'error': 'User not found: {}'.format(user_name)}), 404
+
+    user_id = user.id
+
+    # 构建优化提示
+    optimize_promote = f'''作为考研英语写作专家，请对以下段落进行优化，并给出有效建议：{paragraph}'''
+
+    try:
+        # 调用DeepSeek API进行优化
+        response = Generation.call(
+            model='qwen-turbo',
+            messages=[
+                {
+                    'role': 'system',
+                    'content': optimize_promote
+                }
+            ]
+        )
+
+        # 保存优化结果到数据库
+        insert_message(user_id, 'assistant', get_user_message_max_chat_num(user_id) + 1, paragraph, response.output.text)
+
+        return jsonify({
+            'status_code': response.status_code,
+            'request_id': response.request_id,
+            'error_code': response.code if response.code else '',
+            'usage': {
+                'input_tokens': response.usage.input_tokens,
+                'output_tokens': response.usage.output_tokens,
+                'total_tokens': response.usage.total_tokens
+            },
+            'data': {
+                'optimized_paragraph': response.output.text
+            }
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 @app.route('/login', methods=['POST'])
 def login():
