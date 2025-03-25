@@ -134,3 +134,47 @@ body {
   /* 修改为使用 flexbox 右移 */
   margin-left: auto; 
 }
+
+
+/* 新增分析结果样式 */
+#analysis-module {
+    padding: 20px;
+    border: 1px solid #eee;
+    margin-top: 15px;
+}
+
+/* 新增结果容器样式 */
+.result-container {
+    padding: 15px;
+    margin: 10px;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    background: #f8f9fa;
+}
+
+/* 修改预格式文本样式 */
+#analysis-result {
+    white-space: pre-wrap;
+    font-family: 'Microsoft YaHei', sans-serif;
+    line-height: 1.6;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 6px;
+    margin: 10px 0;
+}
+
+/* 添加标题样式 */
+#analysis-result h3 {
+    color: #2A5C9A;
+    margin: 15px 0;
+}
+
+/* 处理列表样式 */
+#analysis-result ul {
+    padding-left: 20px;
+    list-style-type: square;
+}
+    max-height: 400px;
+    overflow-y: auto;
+    padding: 10px;
+}

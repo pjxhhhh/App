@@ -1,22 +1,3 @@
-// 获取按钮和模块容器元素
-const loadQuestionAnalysisBtn = document.getElementById('load-question-analysis');
-const loadOutlineAssistantBtn = document.getElementById('load-outline-assistant');
-const moduleContainer = document.getElementById('module-container');
-
-// 加载题目解析模块的函数
-function loadQuestionAnalysis() {
-  moduleContainer.innerHTML = '<h3>题目解析模块</h3><p>这里是题目解析的多维度分析内容。</p>';
-}
-
-// 加载大纲助手模块的函数
-function loadOutlineAssistant() {
-  moduleContainer.innerHTML = '<h3>大纲助手模块</h3><p>这里是大纲助手的多维度分析内容。</p>';
-}
-
-// 为按钮添加点击事件监听器
-loadQuestionAnalysisBtn.addEventListener('click', loadQuestionAnalysis);
-loadOutlineAssistantBtn.addEventListener('click', loadOutlineAssistant);
-
 // 获取导航栏元素
 const questionAnalysisNav = document.getElementById('question-analysis');
 const essayEditorNav = document.getElementById('essay-editor');
@@ -71,14 +52,50 @@ const userTextInput = document.getElementById('user-text-input');
 const userImageInput = document.getElementById('user-image-input');
 const submitButton = document.getElementById('submit-button');
 
-submitButton.addEventListener('click', function () {
-  const text = userTextInput.value;
-  const file = userImageInput.files[0];
-  if (text) {
-    console.log('用户输入的文本:', text);
+submitButton.addEventListener('click', async () => {
+  const input = document.getElementById('user-text-input');
+  const topic = input.value.trim();
+  
+  if (!topic) {
+      alert('请输入作文题目');
+      return;
   }
-  if (file) {
-    console.log('用户上传的图片:', file.name);
+
+  try {
+      const response = await fetch('http://localhost:5000/initialization', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+              topic: topic,
+              user_name: 'current_user'
+          })
+      });
+      
+      // 新增响应状态日志
+      console.log('HTTP状态码:', response.status);
+      
+      const data = await response.json();
+      console.log('完整响应数据:', data);
+      
+      // 修改点1：添加数据结构校验
+      if (data?.status_code === 200 && data?.output?.text) {
+          const resultElement = document.getElementById('analysis-result');
+          // 修改点2：保留原始格式并自动换行
+          resultElement.innerHTML = data.output.text.replace(/\n/g, '<br>');
+      } else if (data?.error_code) {
+          throw new Error(`后端错误: ${data.error_code}`);
+      } else {
+          throw new Error('无效的响应结构');
+      }
+      
+  } catch (error) {
+      // 修改点3：增强错误日志
+      console.error('完整错误信息:', {
+          error: error.message,
+          responseStatus: response?.status,
+          requestId: data?.request_id
+      });
+      alert(`操作失败: ${error.message}`);
   }
 });
 
@@ -89,19 +106,6 @@ const questionResult = document.getElementById('question-result');
 const generateOutlineBtn = document.getElementById('generate-outline');
 const outlineResult = document.getElementById('outline-result');
 
-analyzeQuestionBtn.addEventListener('click', () => {
-  const question = questionInput.value;
-  // 模拟题型分析结果
-  const analysisResult = {
-    type: '议论文',
-    frequency: '30%',
-    topicCorrelation: '0.8'
-  };
-  questionResult.innerHTML = `
-    <p>题型: ${analysisResult.type}</p>
-    <p>历年出现频率: ${analysisResult.frequency}</p>
-    <pResult.frequency}</p>
-    <p
 // 标签切换功能
 document.querySelectorAll('.tab-item').forEach(tab => {
   tab.addEventListener('click', function() {
