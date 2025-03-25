@@ -1,0 +1,136 @@
+body {
+  display: flex;
+  margin: 0;
+  height: 100vh;
+}
+
+/* 左侧导航区 */
+.left-nav {
+  width: 15%;
+  background-color: #f0f0f0;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+.left-nav ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.left-nav li {
+  margin-bottom: 10px;
+  cursor: pointer;
+}
+
+/* 中间历史会话区 */
+.history-session {
+  width: 15%;
+  background-color: #e0e0e0;
+  padding: 10px;
+  box-sizing: border-box;
+  overflow-y: auto;
+}
+
+#search-input {
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.tag {
+  background-color: #ccc;
+  padding: 5px;
+  margin-top: 10px;
+}
+
+.session {
+  padding: 5px;
+  border-bottom: 1px solid #aaa;
+  cursor: pointer;
+}
+
+/* 右侧主功能区 */
+.main-function {
+  width: 70%;
+  display: flex;
+  flex-direction: column;
+}
+
+.welcome-message {
+  height: 5%;
+  background-color: #f9f9f9;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+.content-generation-area {
+  height: 70%;
+  overflow-y: auto;
+  padding: 10px;
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+}
+
+.user-input-area {
+  height: 25%;
+  padding: 10px;
+  box-sizing: border-box;
+  background-color: #f9f9f9;
+}
+
+#user-text-input {
+  width: 100%;
+  height: 100px;
+  margin-bottom: 10px;
+}
+
+#user-image-input {
+  margin-bottom: 10px;
+}
+
+#module-container > div {
+  margin-top: 20px;
+  border: 1px solid #ccc;
+  padding: 10px;
+}
+
+
+/* 标签导航样式 */
+.tabs-nav {
+  display: flex;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 2px;
+}
+.tab-item {
+  padding: 12px 24px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+.tab-item.active {
+  border-bottom: 2px solid #2A5C9A;
+  color: #2A5C9A;
+  font-weight: 500;
+}
+
+/* 内容切换动画 */
+.tab-content {
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  height: 0;
+  overflow: hidden;
+}
+.tab-content.active {
+  opacity: 1;
+  transform: translateY(0);
+  height: auto;
+}
+
+
+#file-input {
+  margin-right: 10px;
+}
+
+#submit-button {
+  /* 修改为使用 flexbox 右移 */
+  margin-left: auto; 
+}

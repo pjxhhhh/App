@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>三栏式布局应用</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+  <!-- 左侧导航区 -->
+  <div class="left-nav">
+    <h2>功能导航</h2>
+    <ul>
+      <li id="question-analysis">题目解析</li>
+      <li id="essay-editor">作文编辑工作台</li>
+      <li id="my-notes">我的笔记</li>
+    </ul>
+  </div>
+  <!-- 中间历史会话区 -->
+  <div class="history-session">
+    <h2>历史会话</h2>
+    <input type="text" id="search-input" placeholder="按题目类型或题目模糊搜索">
+    <div id="session-list">
+      <div class="tag">图表类</div>
+      <div class="session" data-title="图表类作文标题1">会话记录 1 - 图表类</div>
+      <div class="session" data-title="图表类作文标题2">会话记录 2 - 图表类</div>
+      <div class="tag">议论文类</div>
+      <div class="session" data-title="议论文类作文标题1">会话记录 3 - 议论文类</div>
+    </div>
+  </div>
+  <!-- 右侧主功能区 -->
+  <div class="main-function">
+    <h2>Agent 主功能区</h2>
+    <div class="content-generation-area">
+      <!-- 新增标签导航 -->
+      <div class="tabs-nav">
+        <div class="tab-item active" data-target="analysis-module">题型解析</div>
+        <div class="tab-item" data-target="outline-module">大纲助手</div>
+      </div>
+      <!-- 新增内容模块 -->
+      <div class="tab-content active" id="analysis-module">
+        <!-- 题目解析内容将在此渲染 -->
+      </div>
+      <div class="tab-content" id="outline-module">
+        <!-- 大纲助手内容将在此渲染 -->
+      </div>
+    </div>
+    <div class="user-input-area">
+      <input type="text" id="user-text-input" placeholder="请输入内容">
+      <input type="file" id="user-image-input" accept="image/*">
+      <button id="submit-button">提交</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+
+</html>
