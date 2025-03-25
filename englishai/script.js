@@ -1,82 +1,80 @@
-class EssayAssistant {
-    constructor() {
-        this.dialogSteps = [
-            "核心观点", "论证角度", "数据支撑", 
-            "对比分析", "解决方案", "结论方向",
-            "案例匹配", "词汇选择", "逻辑结构", "最终校验"
-        ];
-        this.currentStep = 0;
-    }
-
-    initDialogProcess() {
-        document.querySelectorAll('.dialog-step').forEach((step, index) => {
-            step.style.display = index === 0 ? 'block' : 'none';
-        });
-        
-        document.querySelector('.btn-next').addEventListener('click', () => {
-            this.goToNextStep();
-        });
-    }
-
-    goToNextStep() {
-        if (this.currentStep < 9) {
-            // 更新进度条
-            document.querySelectorAll('.dialog-process .step')
-                [this.currentStep].classList.remove('active');
-            
-            this.currentStep++;
-            
-            // 显示下一步界面
-            document.querySelectorAll('.dialog-step')
-                .forEach(step => step.style.display = 'none');
-            document.querySelectorAll('.dialog-step')
-                [this.currentStep].style.display = 'block';
-                
-            document.querySelectorAll('.dialog-process .step')
-                [this.currentStep].classList.add('active');
-        } else {
-            this.generateFinalOutline();
-        }
-    }
-
-    initAnalysisSystem() {
-        // 初始化频率图表
-        this.renderFrequencyChart();
-        
-        // 绑定真题点击事件
-        document.querySelectorAll('.analysis-meta li').forEach(li => {
-            li.addEventListener('click', () => this.showFullEssay());
-        });
-    }
-
-    renderFrequencyChart() {
-        // 使用Chart.js实现柱状图
-        const ctx = document.createElement('canvas');
-        new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: ['近1年', '近3年', '近5年'],
-                datasets: [{
-                    data: [15, 24, 19],
-                    backgroundColor: '#2A5C9A'
-                }]
-            }
-        });
-        document.querySelector('.frequency-bar').appendChild(ctx);
-    }
-}
-
 // 在EssayAssistant类中新增案例数据
 class EssayAssistant {
     constructor() {
-        // 新增模拟历史数据
-        this.historyData = [...]; // 保持原有模拟数据不变
+        // 新增按钮事件绑定
+        this.bindInitializationEvent();
+    }
+
+    // 新增事件绑定方法
+    bindInitializationEvent() {
+        const btn = document.querySelector('.btn-initialization');
+        btn.addEventListener('click', () => {
+            const input = document.getElementById('essay-topic');
+            if (!input.value.trim()) {
+                this.showValidationError();
+                return;
+            }
+            this.startAnalysis(input.value);
+        });
+    }
+
+    // 新增验证错误提示
+    showValidationError() {
+        const inputGroup = document.querySelector('.input-core');
+        inputGroup.classList.add('error');
+        setTimeout(() => inputGroup.classList.remove('error'), 2000);
+    }
+
+    // 新增分析流程
+    async startAnalysis(topic) {
+        const loading = document.createElement('div');
+        loading.className = 'loading-overlay';
+        loading.innerHTML = '<div class="loader"></div>正在生成分析报告...';
+        document.body.appendChild(loading);
+    
+        try {
+            const response = await fetch('http://localhost:5000/initialization', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ topic, user_name: 'current_user' })
+            });
+            
+            if (!response.ok) {
+                throw new Error(`请求失败: ${response.status}`);
+            }
+    
+            const data = await response.json();
+            
+            // 修复1：正确获取分析卡片容器
+            const analysisCard = document.querySelector('.analysis-card');
+            
+            // 修复2：更新题目显示
+            analysisCard.querySelector('.meta-item h4').textContent = `题目：${topic}`;
+            
+            // 修复3：正确填充分析内容
+            analysisCard.querySelector('.analysis-meta pre').textContent = data.data.analysis;
+    
+            // 显示成功提示
+            this.showToast('解析成功！', 'success');
+        } catch (error) {
+            console.error('解析失败:', error);
+            this.showToast(`解析失败: ${error.message}`, 'error');
+        } finally {
+            // 确保移除加载状态
+            loading.remove();
+        }
+    }
+
+    // 新增提示方法
+    showToast(message, type = 'info') {
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        toast.textContent = message;
+        document.body.appendChild(toast);
         
-        // 新增初始化调用
-        this.initDomElements();
-        this.initEventListeners();
-        this.initOCRProcessor();
-        this.initHistoryPanel(); // 增加历史面板初始化
+        setTimeout(() => {
+            toast.remove();
+        }, 3000);
     }
 
     // 新增历史面板初始化
@@ -103,37 +101,9 @@ class EssayAssistant {
             item.style.display = text.includes(keyword) ? 'flex' : 'none';
         });
     }
-    this.caseStudies = {
-            "2023": {
-                title: "城市绿化发展",
-                type: "社会现象类",
-                outline: [
-                    "城市绿地面积变化趋势",
-                    "心理健康与社区关系",
-                    "立体绿化实施方案"
-                ],
-                samples: [
-                    { title: "2023真题范文", similarity: 0.92 }
-                ]
-            }
-        };
-    }
-
-    // 新增案例渲染方法
-    renderCaseStudy(year = "2023") {
-        const data = this.caseStudies[year];
-        return `
-            <div class="case-study-${year}">
-                <h3>📚 ${year}真题案例</h3>
-                <div class="outline-sample">
-                    ${data.outline.map((item, index) => `
-                        <div class="outline-step">
-                            <span class="step-num">${index + 1}</span>
-                            ${item}
-                        </div>
-                    `).join('')}
-                </div>
-            </div>
-        `;
-    }
 }
+
+// 初始化实例
+document.addEventListener('DOMContentLoaded', () => {
+    new EssayAssistant();
+});
