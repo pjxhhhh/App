@@ -177,9 +177,9 @@ def analyze_topic():
 
         print("response: ", response)
 
-        insert_message(user, 'user', 0, content_topic, response.output.text)
-        
-        # response.raise_for_status()
+        # TODO: 保存生成结果
+        # insert_message(user, 'user', 0, content_topic, response.output.text)
+
         return jsonify({
             'status_code': response.status_code,
             'request_id': response.request_id,
@@ -189,9 +189,8 @@ def analyze_topic():
                 'output_tokens': response.usage.output_tokens,
                 'total_tokens': response.usage.total_tokens
             },
-            'data': {
-                'step': 2,
-                'analysis': response.output.text
+            'output': {
+                'text': response.output.text
             }
         })
     except Exception as e:

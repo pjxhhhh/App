@@ -6,6 +6,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>三栏式布局应用</title>
   <link rel="stylesheet" href="styles.css">
+  <!-- 新增markdown解析库 -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
 
 <body>
@@ -44,6 +46,8 @@
         <!-- 新增结果展示容器 -->
         <div class="result-container">
             <pre id="analysis-result"></pre>
+            <!-- 新增大纲生成按钮 -->
+            <button id="generate-outline-btn" class="floating-btn">确定生成大纲</button>
         </div>
     </div>
     <div class="tab-content" id="outline-module">
@@ -51,9 +55,16 @@
       </div>
     </div>
     <div class="user-input-area">
-      <input type="text" id="user-text-input" placeholder="请输入内容">
+      <div class="input-group">
+        <textarea 
+          id="user-text-input" 
+          placeholder="请输入内容" 
+          rows="1"
+          oninput="this.style.height = 'auto'; this.style.height = this.scrollHeight + 'px'">
+        </textarea>
+        <button id="submit-button" class="wechat-style-btn">发送</button>
+      </div>
       <input type="file" id="user-image-input" accept="image/*">
-      <button id="submit-button">提交</button>
     </div>
   </div>
 
