@@ -54,7 +54,7 @@ messages_schema = MessageSchema(many=True)
 with app.app_context():
     db.create_all()
 
-DEEPSEEK_API_KEY = os.getenv('DEEPSEEK_API_KEY', 'sk-f06f42694798425bb1171b1fae730b58')
+# DEEPSEEK_API_KEY = os.getenv('DEEPSEEK_API_KEY', 'sk-f06f42694798425bb1171b1fae730b58')
 
 dashscope.api_key = 'sk-d998dcc59c7349be944c4ca2aabcb6f2'
 
@@ -63,7 +63,7 @@ user_conversations = dict()
 initialization_promote = '''作为考研英语写作专家，请按以下步骤指导用户：
 1. **题型判断** 
    - 根据输入题目判断属于：现象分析型/观点对比型/问题解决型/图表描述型
-   - 给出近5年同类真题举例（如：2023年"人工智能伦理"→现象分析型）
+   - 给出近10年同类真题举例（如：2023年"人工智能伦理"→现象分析型）
 2. **分析维度拆解**
    - 核心概念定义：用2种方式解释题目关键词
    - 论证坐标系构建：
@@ -82,23 +82,32 @@ initialization_promote = '''作为考研英语写作专家，请按以下步骤�
 5. **语言提升建议**'''
 
 # 在初始化提示词之后添加大纲生成提示
-outline_promote = '''作为考研英语写作专家，请根据以下题目生成标准的三段式或四段式作文大纲：
+outline_promote = '''作为考研英语写作专家，请根据以下题目生成标准的三段式作文大纲：
 1. 结构要求：
    - 三段式：现象描述→原因分析→结论建议
-   - 四段式：引入背景→正反论证→案例支撑→总结升华
 2. 每段需包含：
    - 核心功能定位（如：数据呈现/理论论证）
    - 建议字数范围（例：80-120词）
    - 2-3个学术表达示范
+   - 每一段只需要给出引导思考的中文解析，不需要具体的内容
 3. 格式要求：
    - 使用Markdown列表格式
    - 段首用🔹符号标注
    - 关键术语加粗'''
 
-
-anaylyze_promote = '''作为考研英语写作专家，请针对上面的题目就以下用户的提问或者疑惑进行引导性思考: {}。
+# 构建优化提示
+optimize_promote = '''作为考研英语写作专家，请针对这个考研英语作文题目{}，结合这样的分析{},对用户的作文进行点评分析并提供引导性思考: {}。
 可以基于用户的问题抛出一些问题或者想法来引导用户自主分析，以帮助用户更好地理解题目。
 请注意你需要在最多十论对话内完成,当前是第{}轮。'''
+
+anaylyze_promote = '''作为考研英语写作专家，请针对这个考研英语作文题目{}，结合这样的分析{},对用户的作文进行点评分析并提供引导性思考: {}。'''
+
+
+def insert_user(user_name):
+    user = User(username=user_name)
+    db.session.add(user)
+    db.session.commit()
+    return user
 
 def get_user(user_name, need_create=False, allow_empty=False):
     user = User.query.filter_by(username=user_name).first()
@@ -138,6 +147,26 @@ def index():
         'step': 1,
         'message': 'Welcome to the English Writing Analysis API. Please provide a topic for analysis.'
     })
+
+@app.route('/add_user', methods=['POST'])
+def add_user():
+    if request.headers.get('Content-Type')!= 'application/json':
+        return jsonify({'error': 'Unsupported Media Type'}), 415
+    data = request.get_json()
+    if not data:
+        return jsonify({'error': 'Missing data'}), 400
+    user_name = data.get('user_name')
+    if not user_name:
+        return jsonify({'error': 'Missing user_name parameter'}), 400
+
+    user = get_user(user_name, need_create=True, allow_empty=False)
+    if user:
+        return jsonify({'message': 'User added successfully'}), 201
+
+@app.route('/list_users', methods=['GET'])
+def list_users():
+    users = User.query.all()
+    return jsonify(users_schema.dump(users))
 
 @app.route('/initialization', methods=['POST'])
 def analyze_topic():
@@ -207,10 +236,10 @@ def generate_outline():
         return jsonify({'error': 'Missing data'}), 400
 
     # 参数验证
-    topic = data.get('topic')
+    content = data.get('content')
     user_name = data.get('user_name')
-    if not all([topic, user_name]):
-        return jsonify({'error': 'Missing required parameters'}), 400
+    if not all([content, user_name]):
+        return jsonify({'error': 'Missing required parameters' + content + "; " + user_name}), 400
 
     # 用户验证
     user = User.query.filter_by(username=user_name).first()
@@ -223,12 +252,12 @@ def generate_outline():
             model='qwen-turbo',
             messages=[
                 {"role": "system", "content": outline_promote},
-                {"role": "user", "content": topic}
+                {"role": "user", "content": content}
             ]
         )
 
         # 保存生成结果
-        insert_message(user.id, 'assistant', 0, topic, response.output.text)
+        # insert_message(user.id, 'assistant', 0, topic, response.output.text)
 
         return jsonify({
             'status_code': response.status_code,
@@ -238,8 +267,8 @@ def generate_outline():
                 'output_tokens': response.usage.output_tokens,
                 'total_tokens': response.usage.total_tokens
             },
-            'data': {
-                'outline': response.output.text,
+            'output': {
+                'text': response.output.text,
                 'structure_type': '三段式' if '三段' in response.output.text else '四段式'
             }
         })
@@ -321,8 +350,8 @@ def analyze():
         
         return jsonify({
             'status_code': response.status_code,
-            'data': {
-                'response': response.output.text,
+            'output': {
+                'text': response.output.text,
                 'current_round': len(user_conversations[user_id])
             }
         })
@@ -338,6 +367,16 @@ def optimize():
     data = request.get_json()
     if not data:
         return jsonify({'error': 'Missing data'}), 400
+
+    # 获取用户提供的作文题目
+    topic = data.get('topic')
+    if not topic:
+        return jsonify({'error': 'Missing topic parameter'}), 400
+
+    # 获取当前段落的分析
+    analysis = data.get('analysis')
+    if not analysis:
+        return jsonify({'error': 'Missing analysis parameter'}), 400
 
     # 获取用户提供的段落
     paragraph = data.get('paragraph')
@@ -356,8 +395,8 @@ def optimize():
 
     user_id = user.id
 
-    # 构建优化提示
-    optimize_promote = f'''作为考研英语写作专家，请对以下段落进行优化，并给出有效建议：{paragraph}'''
+    # total_content = optimize_promote.format(topic, analysis, paragraph, get_user_message_max_chat_num(user_id) + 1)
+    total_content = optimize_promote.format(topic, analysis, paragraph, 1)
 
     try:
         # 调用DeepSeek API进行优化
@@ -366,13 +405,16 @@ def optimize():
             messages=[
                 {
                     'role': 'system',
-                    'content': optimize_promote
+                    'content': total_content
                 }
             ]
         )
 
+        # TODO: delete
         # 保存优化结果到数据库
-        insert_message(user_id, 'assistant', get_user_message_max_chat_num(user_id) + 1, paragraph, response.output.text)
+        # insert_message(user_id, 'assistant', get_user_message_max_chat_num(user_id) + 1, paragraph, response.output.text)
+
+        print("optimize api response: ", response)
 
         return jsonify({
             'status_code': response.status_code,
@@ -383,8 +425,8 @@ def optimize():
                 'output_tokens': response.usage.output_tokens,
                 'total_tokens': response.usage.total_tokens
             },
-            'data': {
-                'optimized_paragraph': response.output.text
+            'output': {
+                'text': response.output.text
             }
         })
     except Exception as e:

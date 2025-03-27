@@ -299,3 +299,40 @@ body {
     border: 1px solid #ffe3e6;
     background: #fff5f6;
 }
+
+.outline-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 15px;
+}
+
+.outline-section {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 15px;
+    background: #f9f9f9;
+}
+
+.outline-header {
+    font-weight: bold;
+    font-size: 1.2em;
+    margin-bottom: 10px;
+    color: #2A5C9A;
+}
+
+.outline-content {
+    margin-bottom: 15px;
+    padding: 10px;
+    background: white;
+    border-radius: 4px;
+}
+
+.outline-input {
+    width: 100%;
+    min-height: 80px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    resize: vertical;
+}

@@ -61,6 +61,11 @@ submitButton.addEventListener('click', async () => {
       return;
   }
 
+  // 新增加载提示
+  const resultElement = document.getElementById('analysis-result');
+  resultElement.textContent = '疯狂思考中......';
+  resultElement.classList.add('loading-animation');
+
   try {
       const response = await fetch('http://localhost:5000/initialization', {
           method: 'POST',
@@ -79,16 +84,12 @@ submitButton.addEventListener('click', async () => {
       
       // 修改点1：添加数据结构校验
       if (data?.status_code === 200 && data?.output?.text) {
-          const resultElement = document.getElementById('analysis-result');
-          // 使用marked解析markdown
+          resultElement.classList.remove('loading-animation');  // 移除加载样式
           resultElement.innerHTML = marked.parse(data.output.text);
-      } else if (data?.error_code) {
-          throw new Error(`后端错误: ${data.error_code}`);
-      } else {
-          throw new Error('无效的响应结构');
       }
       
   } catch (error) {
+      resultElement.classList.remove('loading-animation');  // 移除加载样式
       // 修改点3：增强错误日志
       console.error('完整错误信息:', {
           error: error.message,
@@ -134,30 +135,44 @@ function switchTab(targetId) {
 document.getElementById('generate-outline-btn').addEventListener('click', async () => {
     const content = document.getElementById('analysis-result').textContent;
     
-    // 切换到大纲标签并显示加载状态
+    if (!content.trim()) {
+        alert('请先完成题目解析再生成大纲');
+        return;
+    }
+
     switchTab('outline-module');
     const outlineBox = document.getElementById('outline-module');
     outlineBox.innerHTML = '<div class="loading-text">大纲生成中.......</div>';
     
     try {
-        const response = await fetch('http://localhost:5000/outline', {  // 添加完整接口地址
+        const response = await fetch('http://localhost:5000/outline', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({
                 content: content,
-                user_name: 'current_user'  // 保持参数格式统一
+                user_name: 'current_user'
             })
         });
 
-        // 添加响应状态日志
-        console.log('大纲请求状态码:', response.status);
-        
         const data = await response.json();
-        console.log('大纲响应数据:', data);
         
-        // 根据返回格式调整数据结构校验
-        if (data?.status_code === 200 && data?.data?.outline) {
-            outlineBox.innerHTML = marked.parse(data.data.outline); 
+        if (data?.status_code === 200 && data?.output?.text) {
+            // 解析大纲内容并拆分成三段
+            const outlineContent = data.output.text;
+            const sections = outlineContent.split('---');
+            
+            // 创建三段式大纲容器
+            outlineBox.innerHTML = `
+                <div class="outline-container">
+                    ${sections.map((section, index) => `
+                        <div class="outline-section">
+                            <div class="outline-header">${section.split('\n')[0].trim() || `段落 ${index + 1}`}</div>
+                            <div class="outline-content">${marked.parse(section)}</div>
+                            <textarea class="outline-input" placeholder="在此输入对第${index + 1}段的修改建议..."></textarea>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
         } else if (data?.error_code) {
             throw new Error(`后端错误: ${data.error_code}`);
         } else {
