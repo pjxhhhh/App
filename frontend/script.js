@@ -4,33 +4,33 @@ const essayEditorNav = document.getElementById('essay-editor');
 const myNotesNav = document.getElementById('my-notes');
 
 // 获取模块元素
-const questionAnalysisModule = document.getElementById('question-analysis-module');
+const questionAnalysisInterface = document.getElementById('question-analysis-interface');
 const essayEditorModule = document.getElementById('essay-editor-module');
 const myNotesModule = document.getElementById('my-notes-module');
 
 // 显示指定模块并隐藏其他模块
 function showModule(module) {
-  questionAnalysisModule.style.display = 'none';
+  questionAnalysisInterface.style.display = 'none';
   essayEditorModule.style.display = 'none';
   myNotesModule.style.display = 'none';
-  module.style.display = 'block';
+  module.style.display = 'flex';
 }
 
 // 导航栏点击事件
-questionAnalysisNav.addEventListener('click', () => showModule(questionAnalysisModule));
+questionAnalysisNav.addEventListener('click', () => showModule(questionAnalysisInterface));
 essayEditorNav.addEventListener('click', () => showModule(essayEditorModule));
 myNotesNav.addEventListener('click', () => showModule(myNotesModule));
 
-// 历史会话搜索功能
+// 历史会话区搜索功能
 const searchInput = document.getElementById('search-input');
 const sessionList = document.getElementById('session-list');
-const sessions = sessionList.querySelectorAll('.session');
 
 searchInput.addEventListener('input', function () {
-  const searchTerm = this.value.toLowerCase();
+  const searchText = this.value.toLowerCase();
+  const sessions = sessionList.querySelectorAll('.session');
   sessions.forEach(session => {
     const title = session.dataset.title.toLowerCase();
-    if (title.includes(searchTerm)) {
+    if (title.includes(searchText)) {
       session.style.display = 'block';
     } else {
       session.style.display = 'none';
@@ -38,153 +38,153 @@ searchInput.addEventListener('input', function () {
   });
 });
 
-// 会话记录点击跳转功能
-sessions.forEach(session => {
-  session.addEventListener('click', function () {
-    const title = this.dataset.title;
-    // 这里可以添加跳转到对应内容的逻辑
-    console.log(`跳转到 ${title} 的内容`);
-  });
-});
+// 模块切换功能
+const questionAnalysisBtn = document.getElementById('question-analysis-btn');
+const outlineAssistantBtn = document.getElementById('outline-assistant-btn');
 
-// 用户输入区提交功能
-const userTextInput = document.getElementById('user-text-input');
-const userImageInput = document.getElementById('user-image-input');
-const submitButton = document.getElementById('submit-button');
+// 获取模块内容
+const questionAnalysisContent = document.getElementById('question-analysis-content');
+const outlineAssistantContent = document.getElementById('outline-assistant-content');
 
-submitButton.addEventListener('click', async () => {
-  const input = document.getElementById('user-text-input');
-  const topic = input.value.trim();
-  
-  if (!topic) {
-      alert('请输入作文题目');
-      return;
-  }
+// 切换模块内容和导航按钮状态
+function switchModule(activeBtn, activeContent) {
+  const allBtns = [questionAnalysisBtn, outlineAssistantBtn];
+  const allContents = [questionAnalysisContent, outlineAssistantContent];
 
-  // 新增加载提示
-  const resultElement = document.getElementById('analysis-result');
-  resultElement.textContent = '疯狂思考中......';
-  resultElement.classList.add('loading-animation');
+  allBtns.forEach(btn => btn.classList.remove('active'));
+  allContents.forEach(content => content.style.display = 'none');
 
-  try {
-      const response = await fetch('http://localhost:5000/initialization', {
-          method: 'POST',
-          headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({
-              topic: topic,
-              user_name: 'current_user'
-          })
-      });
-      
-      // 新增响应状态日志
-      console.log('HTTP状态码:', response.status);
-      
-      const data = await response.json();
-      console.log('完整响应数据:', data);
-      
-      // 修改点1：添加数据结构校验
-      if (data?.status_code === 200 && data?.output?.text) {
-          resultElement.classList.remove('loading-animation');  // 移除加载样式
-          resultElement.innerHTML = marked.parse(data.output.text);
-      }
-      
-  } catch (error) {
-      resultElement.classList.remove('loading-animation');  // 移除加载样式
-      // 修改点3：增强错误日志
-      console.error('完整错误信息:', {
-          error: error.message,
-          responseStatus: response?.status,
-          requestId: data?.request_id
-      });
-      alert(`操作失败: ${error.message}`);
-  }
-});
-
-// 题目解析模块功能
-const questionInput = document.getElementById('question-input');
-const analyzeQuestionBtn = document.getElementById('analyze-question');
-const questionResult = document.getElementById('question-result');
-const generateOutlineBtn = document.getElementById('generate-outline');
-const outlineResult = document.getElementById('outline-result');
-
-// 标签切换功能
-document.querySelectorAll('.tab-item').forEach(tab => {
-  tab.addEventListener('click', function() {
-    // 移除所有激活状态
-    document.querySelectorAll('.tab-item, .tab-content').forEach(el => {
-      el.classList.remove('active');
-    });
-    
-    // 激活当前标签及对应内容
-    this.classList.add('active');
-    const target = document.getElementById(this.dataset.target);
-    target.classList.add('active');
-  });
-});
-
-// 在文件末尾新增按钮事件监听
-// 添加标签切换功能
-function switchTab(targetId) {
-    document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-    document.querySelectorAll('.tab-item').forEach(el => el.classList.remove('active'));
-    document.getElementById(targetId).classList.add('active');
-    document.querySelector(`[data-target="${targetId}"]`).classList.add('active');
+  activeBtn.classList.add('active');
+  activeContent.style.display = 'block';
 }
 
-// 大纲生成按钮事件
-document.getElementById('generate-outline-btn').addEventListener('click', async () => {
-    const content = document.getElementById('analysis-result').textContent;
-    
-    if (!content.trim()) {
-        alert('请先完成题目解析再生成大纲');
-        return;
-    }
-
-    switchTab('outline-module');
-    const outlineBox = document.getElementById('outline-module');
-    outlineBox.innerHTML = '<div class="loading-text">大纲生成中.......</div>';
-    
-    try {
-        const response = await fetch('http://localhost:5000/outline', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({
-                content: content,
-                user_name: 'current_user'
-            })
-        });
-
-        const data = await response.json();
-        
-        if (data?.status_code === 200 && data?.output?.text) {
-            // 解析大纲内容并拆分成三段
-            const outlineContent = data.output.text;
-            const sections = outlineContent.split('---');
-            
-            // 创建三段式大纲容器
-            outlineBox.innerHTML = `
-                <div class="outline-container">
-                    ${sections.map((section, index) => `
-                        <div class="outline-section">
-                            <div class="outline-header">${section.split('\n')[0].trim() || `段落 ${index + 1}`}</div>
-                            <div class="outline-content">${marked.parse(section)}</div>
-                            <textarea class="outline-input" placeholder="在此输入对第${index + 1}段的修改建议..."></textarea>
-                        </div>
-                    `).join('')}
-                </div>
-            `;
-        } else if (data?.error_code) {
-            throw new Error(`后端错误: ${data.error_code}`);
-        } else {
-            throw new Error('无效的大纲响应结构');
-        }
-        
-    } catch (error) {
-        // 增强错误日志
-        console.error('大纲生成错误:', {
-            error: error.message,
-            requestContent: content.substring(0, 50) + '...'
-        });
-        outlineBox.innerHTML = `<div class="error">大纲生成失败: ${error.message}</div>`;
-    }
+// 绑定点击事件
+questionAnalysisBtn.addEventListener('click', () => {
+  switchModule(questionAnalysisBtn, questionAnalysisContent);
 });
+
+outlineAssistantBtn.addEventListener('click', () => {
+  switchModule(outlineAssistantBtn, outlineAssistantContent);
+});
+
+// 用户输入提交功能
+const userInputText = document.getElementById('user-input-text');
+const imageUpload = document.getElementById('image-upload');
+const modelSelect = document.getElementById('model-select');
+const searchOnline = document.getElementById('search-online');
+const submitBtn = document.getElementById('submit-btn');
+
+submitBtn.addEventListener('click', function () {
+  const inputText = userInputText.value;
+  const selectedModel = modelSelect.value;
+  // 这里可以添加处理输入文本、图片和模型选择的逻辑
+  console.log('输入文本:', inputText);
+  console.log('选择的模型:', selectedModel);
+});
+
+userInputText.addEventListener('keydown', function (event) {
+  if (event.key === 'Enter') {
+    event.preventDefault();
+    submitBtn.click();
+  }
+});
+
+// 模拟提交作文函数
+function submitEssay(index) {
+  console.log(`提交作文段落 ${index}`);
+}
+
+// 模拟保存作文函数
+function saveEssay(index) {
+  console.log(`保存作文段落 ${index}`);
+}
+
+// 初始化优化功能
+function initOptimize() {
+  const optimizeButtons = document.querySelectorAll('[id^="ai-optimize-"]');
+  const modal = document.getElementById('optimize-modal');
+  const loadingOverlay = document.getElementById('loading-overlay');
+  const cancelBtn = document.getElementById('cancel-btn');
+  let timeoutId;
+
+  optimizeButtons.forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const textarea = btn.closest('.writing-section').querySelector('textarea');
+      const originalText = textarea.value;
+
+      // 显示弹窗
+      modal.style.display = 'block';
+      document.getElementById('original-text').textContent = originalText;
+
+      // 显示加载状态
+      loadingOverlay.style.display = 'flex';
+
+      // 设置超时
+      timeoutId = setTimeout(() => {
+        loadingOverlay.style.display = 'none';
+        alert('优化请求超时，请稍后重试');
+      }, 10000); // 10秒超时
+
+      try {
+        // 调用AI优化服务
+        const optimizedText = await callAIOptimizeService(originalText);
+        clearTimeout(timeoutId);
+
+        // 显示优化结果
+        loadingOverlay.style.display = 'none';
+        showDiff(originalText, optimizedText);
+      } catch (error) {
+        clearTimeout(timeoutId);
+        loadingOverlay.style.display = 'none';
+        alert('优化失败：' + error.message);
+      }
+    });
+  });
+
+  // 取消按钮
+  cancelBtn.addEventListener('click', () => {
+    clearTimeout(timeoutId);
+    loadingOverlay.style.display = 'none';
+    alert('优化已取消');
+  });
+
+  // 关闭弹窗
+  modal.querySelector('.close-btn').addEventListener('click', () => {
+    modal.style.display = 'none';
+  });
+
+  // 点击外部关闭
+  window.addEventListener('click', (event) => {
+    if (event.target === modal) {
+      modal.style.display = 'none';
+    }
+  });
+}
+
+// 显示文本差异
+function showDiff(original, optimized) {
+  const diff = Diff.diffWords(original, optimized);
+  const originalHtml = [];
+  const optimizedHtml = [];
+
+  diff.forEach(part => {
+    const value = part.value.replace(/\n/g, '<br>');
+    if (part.added) {
+      optimizedHtml.push(`<span class="diff-added">${value}</span>`);
+    } else if (part.removed) {
+      originalHtml.push(`<span class="diff-removed">${value}</span>`);
+    } else {
+      originalHtml.push(value);
+      optimizedHtml.push(value);
+    }
+  });
+
+  document.getElementById('original-text').innerHTML = originalHtml.join('');
+  document.getElementById('optimized-text').innerHTML = optimizedHtml.join('');
+}
+
+// 初始化
+document.addEventListener('DOMContentLoaded', () => {
+  initOptimize();
+});
+

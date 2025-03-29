@@ -6,8 +6,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>三栏式布局应用</title>
   <link rel="stylesheet" href="styles.css">
-  <!-- 新增markdown解析库 -->
-  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
 
 <body>
@@ -20,54 +18,134 @@
       <li id="my-notes">我的笔记</li>
     </ul>
   </div>
-  <!-- 中间历史会话区 -->
-  <div class="history-session">
-    <h2>历史会话</h2>
-    <input type="text" id="search-input" placeholder="按题目类型或题目模糊搜索">
-    <div id="session-list">
-      <div class="tag">图表类</div>
-      <div class="session" data-title="图表类作文标题1">会话记录 1 - 图表类</div>
-      <div class="session" data-title="图表类作文标题2">会话记录 2 - 图表类</div>
-      <div class="tag">议论文类</div>
-      <div class="session" data-title="议论文类作文标题1">会话记录 3 - 议论文类</div>
-    </div>
-  </div>
-  <!-- 右侧主功能区 -->
-  <div class="main-function">
-    <h2>Agent 主功能区</h2>
-    <div class="content-generation-area">
-      <!-- 新增标签导航 -->
-      <div class="tabs-nav">
-        <div class="tab-item active" data-target="analysis-module">题型解析</div>
-        <div class="tab-item" data-target="outline-module">大纲助手</div>
+  <!-- 题目解析界面 -->
+  <div id="question-analysis-interface" style="display: none;">
+    <!-- 历史会话区 -->
+    <div class="history-session">
+      <h2>历史会话</h2>
+      <input type="text" id="search-input" placeholder="按题目类型或题目模糊搜索">
+      <div id="session-list">
+        <div class="tag">图表类</div>
+        <div class="session" data-title="图表类作文标题1">会话记录 1 - 图表类</div>
+        <div class="session" data-title="图表类作文标题2">会话记录 2 - 图表类</div>
+        <div class="tag">议论文类</div>
+        <div class="session" data-title="议论文类作文标题1">会话记录 3 - 议论文类</div>
       </div>
-      <!-- 新增内容模块 -->
-      <div class="tab-content active" id="analysis-module">
-        <!-- 新增结果展示容器 -->
-        <div class="result-container">
-            <pre id="analysis-result"></pre>
-            <!-- 新增大纲生成按钮 -->
-            <button id="generate-outline-btn" class="floating-btn">确定生成大纲</button>
+    </div>
+    <!-- Agent 对话区 -->
+    <div class="agent-dialog">
+      <!-- 顶部欢迎语 -->
+      <div class="welcome-message">Hi~我是你的考研助手</div>
+      <!-- 中间内容生成区 -->
+      <div class="content-generation">
+        <div class="module-nav">
+          <button id="question-analysis-btn" class="active">题目解析</button>
+          <button id="outline-assistant-btn">大纲助手</button>
         </div>
-    </div>
-    <div class="tab-content" id="outline-module">
-        <!-- 大纲助手内容将在此渲染 -->
+        <div id="question-analysis-content" class="module-content">
+          <h3>题目解析</h3>
+          <div id="question-result"></div>
+        </div>
+        <div id="outline-assistant-content" class="module-content" style="display: none;">
+          <h3>大纲助手</h3>
+          <div id="outline-result"></div>
+        </div>
       </div>
-    </div>
-    <div class="user-input-area">
-      <div class="input-group">
-        <textarea 
-          id="user-text-input" 
-          placeholder="请输入内容" 
-          rows="1"
-          oninput="this.style.height = 'auto'; this.style.height = this.scrollHeight + 'px'"></textarea>
-        <button id="submit-button" class="wechat-style-btn">发送</button>
+      <!-- 下方用户输入区 -->
+      <div class="user-input">
+        <textarea id="user-input-text" placeholder="请输入作文题目或上传图片"></textarea>
+        <input type="file" id="image-upload" accept="image/*">
+        <select id="model-select">
+          <option value="model1">模型 1</option>
+          <option value="model2">模型 2</option>
+        </select>
+        <button id="search-online">联网搜索</button>
+        <button id="submit-btn">提交 <i class="arrow"></i></button>
       </div>
-      <input type="file" id="user-image-input" accept="image/*">
     </div>
   </div>
+  <!-- 其他功能模块 -->
+  <div id="essay-editor-module" style="display: none;">
+    <div class="editor-header">
+      <h3>HI,我是你的考研小助手</h3>
+    </div>
+    <div class="editor-content">
+      <!-- 第一组 -->
+      <div class="editor-group">
+        <div class="outline-section">
+          <h4>段落1</h4>
+          <!-- 这里展示大纲内容，由题目解析生成的内容前端缓存带出 -->
+          <p>你可以按照“描述图片与图表简要介绍插图中的场景，包括公园的环境、锻炼的人们</p>
+        </div>
+        <div class="writing-section">
+          <textarea id="writing-input-1" placeholder="请输入英文内容，翻译大纲内容"></textarea>
+          <div class="button-group">
+            <button id="save-1">保存</button>
+            <button id="ai-optimize-1">AI优化</button>
+          </div>
+        </div>
+      </div>
+      <!-- 第二组 -->
+      <div class="editor-group">
+        <div class="outline-section">
+          <h4>段落2</h4>
+          <!-- 这里展示大纲内容，由题目解析生成的内容前端缓存带出 -->
+          <p>描述柱状图的内,指出公园数量在2020年至2022年间的增长趋势。解释图表的意图分析图表数据所反映的社会现象</p>
+        </div>
+        <div class="writing-section">
+          <textarea id="writing-input-2" placeholder="请输入英文内容，翻译大纲内容"></textarea>
+          <div class="button-group">
+            <button id="save-2">保存</button>
+            <button id="ai-optimize-2">AI优化</button>
+          </div>
+        </div>
+      </div>
+      <!-- 第三组 -->
+      <div class="editor-group">
+        <div class="outline-section">
+          <h4>段落3</h4>
+          <!-- 这里展示大纲内容，由题目解析生成的内容前端缓存带出 -->
+          <p>探讨这种变化给当地居民生活带来的积极影响，如提高居民的健康水平、增强社区凝聚力等。个人评论表达你对这一变化的看法；讨论这种变化可能带来的长远影响，例如环境改善、城市形象提升等</p>
+        </div>
+        <div class="writing-section">
+          <textarea id="writing-input-3" placeholder="请输入英文内容，翻译大纲内容"></textarea>
+          <div class="button-group">
+            <button id="save-3">保存</button>
+            <button id="ai-optimize-3">AI优化</button>
+          </div>
+        </div>
+
+
+
+  <div id="my-notes-module" style="display: none;">
+    <h3>我的笔记</h3>
+    <!-- 这里可以添加笔记存储的具体内容 -->
+  </div>
+  
 
   <script src="script.js"></script>
 </body>
 
 </html>
+
+<!-- 新增优化对比弹窗 -->
+<div id="optimize-modal" class="modal">
+  <div class="modal-content">
+    <div class="compare-container">
+      <div class="original-section">
+        <h4>原文</h4>
+        <div class="text-content" id="original-text"></div>
+      </div>
+      <div class="optimized-section">
+        <h4>优化建议</h4>
+        <div class="text-content" id="optimized-text"></div>
+      </div>
+    </div>
+    <div class="loading-overlay" id="loading-overlay">
+      <div class="spinner"></div>
+      <div class="loading-text">优化中...</div>
+      <button id="cancel-btn">取消</button>
+    </div>
+    <button class="close-btn">&times;</button>
+  </div>
+</div>

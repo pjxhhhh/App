@@ -6,25 +6,36 @@ body {
 
 /* 左侧导航区 */
 .left-nav {
-  width: 15%;
+  width: 10%; /* 修改为10% */
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 100;
   background-color: #f0f0f0;
   padding: 10px;
   box-sizing: border-box;
 }
 
-.left-nav ul {
-  list-style-type: none;
-  padding: 0;
+/* 调整主容器布局 */
+body {
+  padding-left: 10%; /* 对应修改为10% */
 }
 
-.left-nav li {
-  margin-bottom: 10px;
-  cursor: pointer;
+.main-function {
+  width: 90%; /* 修改为100%-10% */
+  margin-left: 10%; /* 对应修改为10% */
 }
 
-/* 中间历史会话区 */
+/* 题目解析界面 */
+#question-analysis-interface {
+  display: flex;
+  width: 100%; /* 修改为父容器的100% */
+}
+
+/* 历史会话区 */
 .history-session {
-  width: 15%;
+  width: 15%; /* 保持内部比例不变 */
   background-color: #e0e0e0;
   padding: 10px;
   box-sizing: border-box;
@@ -48,291 +59,258 @@ body {
   cursor: pointer;
 }
 
-/* 右侧主功能区 */
-.main-function {
-  width: 70%;
+/* Agent 对话区 */
+.agent-dialog {
+  width: 85%;
   display: flex;
   flex-direction: column;
 }
 
+/* 顶部欢迎语 */
 .welcome-message {
   height: 5%;
   background-color: #f9f9f9;
   padding: 10px;
   box-sizing: border-box;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 20px;
+  font-weight: bold;
+  color: #333;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
 }
 
-.content-generation-area {
+
+/* 中间内容生成区 */
+.content-generation {
   height: 70%;
   overflow-y: auto;
   padding: 10px;
   box-sizing: border-box;
-  border: 1px solid #ccc;
 }
 
-/* 微信式输入框布局 */
-.user-input-area {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    padding: 8px !important;
-}
-
-.input-group {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-}
-
-#user-text-input {
-    flex: 1;
-    resize: none;
-    min-height: 40px;
-    max-height: 120px;
-    overflow-y: auto;
-    line-height: 1.5;
-    padding: 8px 16px !important;
-    border-radius: 20px;
-    padding: 0 16px;
-    border: 1px solid #ddd;
-}
-
-.wechat-style-btn {
-    width: 60px;
-    height: 40px;
-    border-radius: 50%;
-    background: #07C160;
-    color: white;
-    border: none;
-    font-size: 18px;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.wechat-style-btn:hover {
-    background: #059048;
-}
-
-#user-image-input {
-    order: -1;
-    margin-left: 8px;
-}
-
-#module-container > div {
-  margin-top: 20px;
-  border: 1px solid #ccc;
-  padding: 10px;
-}
-
-
-/* 标签导航样式 */
-.tabs-nav {
+.module-nav {
   display: flex;
-  border-bottom: 1px solid #ddd;
-  padding-bottom: 2px;
 }
-.tab-item {
-  padding: 12px 24px;
+
+.module-nav button {
+  background: none;
+  border: none;
   cursor: pointer;
-  transition: all 0.3s;
-}
-.tab-item.active {
-  border-bottom: 2px solid #2A5C9A;
-  color: #2A5C9A;
-  font-weight: 500;
-}
-
-/* 内容切换动画 */
-.tab-content {
-  opacity: 0;
-  transform: translateY(10px);
-  transition: opacity 0.3s ease, transform 0.3s ease;
-  height: 0;
-  overflow: hidden;
-}
-.tab-content.active {
-  opacity: 1;
-  transform: translateY(0);
-  height: auto;
-}
-
-
-#file-input {
+  padding: 10px;
   margin-right: 10px;
 }
 
-#submit-button {
-  /* 修改为使用 flexbox 右移 */
-  margin-left: auto; 
+.module-nav button.active {
+  border-bottom: 2px solid #2A5C9A;
 }
 
-
-/* 新增分析结果样式 */
-#analysis-module {
-    padding: 20px;
-    border: 1px solid #eee;
-    margin-top: 15px;
+.module-content {
+  margin-top: 20px;
 }
 
-/* 调整结果容器 */
-.result-container {
-    position: relative; /* 为按钮定位提供基准 */
-    height: 50vh;      /* 使用视口高度单位 */
-    padding: 15px;
+/* 下方用户输入区 */
+.user-input {
+  height: 25%;
+  padding: 10px;
+  box-sizing: border-box;
+  background-color: #f9f9f9;
 }
 
-#analysis-result {
-    width: 100%;        /* 留出右边距 */
-    height: calc(100% - 100px); /* 预留按钮空间 */
-    overflow-y: auto;  /* 添加滚动条 */
-    margin: 0 auto;    /* 居中显示 */
+#user-input-text {
+  width: 100%;
+  height: 60%;
+  margin-bottom: 10px;
 }
 
-/* 新增悬浮按钮样式 */
-.floating-btn {
-    position: absolute;
-    right: 20px;
-    bottom: 20px;
-    padding: 12px 24px;
-    background: #2A5C9A;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: all 0.3s;
+/* 新增：作文编辑工作台样式 */
+#essay-editor-module {
+  display: flex;
+  flex-direction: column;
+  height: 25%; /* 与用户输入区高度一致 */
+  padding: 10px; /* 与用户输入区内边距一致 */
+  box-sizing: border-box; /* 与用户输入区盒模型计算方式一致 */
+  background-color: #f9f9f9; /* 与用户输入区背景颜色一致 */
 }
 
-.floating-btn:hover {
-    background: #1E416C;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-}
-
-/* 修改预格式文本样式 */
-#analysis-result {
-    white-space: pre-wrap;
-    font-family: 'Microsoft YaHei', sans-serif;
-    line-height: 1.2;
-    font-size: 14px;
-    padding: 15px;
-    margin: 10px 0;
-    background: #f8f9fa;
-    border-radius: 6px;
-    width: 100%;
-    height: calc(100% - 100px);
-    overflow-y: scroll;
-    scrollbar-width: thin;
-    scrollbar-color: #2A5C9A #f0f0f0;
-}
-
-/* 滚动条样式统一 */
-#analysis-result::-webkit-scrollbar {
-    width: 8px;
-}
-#analysis-result::-webkit-scrollbar-track {
-    background: #f0f0f0;
-    border-radius: 4px;
-}
-#analysis-result::-webkit-scrollbar-thumb {
-    background-color: #2A5C9A;
-    border-radius: 4px;
-    border: 2px solid #f0f0f0;
-}
-
-/* 合并后的Markdown样式 */
-#analysis-result h1, 
-#analysis-result h2, 
-#analysis-result h3 {
-    color: #2A5C9A;
-    margin: 12px 0;
-}
-
-#analysis-result p {
-    margin: 5px 0;
-    line-height: 1.4;
-}
-
-#analysis-result ul {
-    padding-left: 20px;
-    list-style-type: square;
-}
-
-#analysis-result li {
-    margin: 3px 0;
-    line-height: 1.3;
-}
-
-#analysis-result pre {
-    background: #f5f7fa;
-    padding: 15px;
-    border-radius: 6px;
-    overflow-x: auto;
-}
-
-#analysis-result code {
-    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
-}
-
-#analysis-result strong {
-    color: #d63200;
-}
-
-
-/* 加载提示样式 */
-.loading-text {
-    color: #666;
-    padding: 20px;
-    font-style: italic;
-    animation: pulse 1.5s infinite;
-}
-
-@keyframes pulse {
-    0% { opacity: 1; }
-    50% { opacity: 0.5; }
-    100% { opacity: 1; }
-}
-
-/* 错误提示样式 */
-.error {
-    color: #dc3545;
-    padding: 15px;
-    border: 1px solid #ffe3e6;
-    background: #fff5f6;
-}
-
-.outline-container {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    padding: 15px;
+.editor-group {
+  display: flex;
+  margin-bottom: 20px;
+  align-items: flex-start; /* 新增：使内容顶部对齐 */
 }
 
 .outline-section {
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    padding: 15px;
-    background: #f9f9f9;
+  width: 80%;
+  padding: 10px;
+  border-right: 1px solid #ccc;
+  box-sizing: border-box; /* 确保内边距和边框包含在宽度内 */
 }
 
-.outline-header {
-    font-weight: bold;
-    font-size: 1.2em;
-    margin-bottom: 10px;
-    color: #2A5C9A;
+.writing-section {
+  width: 85%;
+  padding: 10px;
+  box-sizing: border-box; /* 确保内边距和边框包含在宽度内 */
 }
 
-.outline-content {
-    margin-bottom: 15px;
-    padding: 10px;
-    background: white;
-    border-radius: 4px;
+.writing-section textarea {
+  width: 100%;
+  height: 100px;
+  margin-bottom: 10px;
 }
 
-.outline-input {
-    width: 100%;
-    min-height: 80px;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    resize: vertical;
+.button-group {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 0px; /* 根据实际情况调整，确保按钮在输入框右下方 */
+  margin-right: 10px; /* 根据实际情况调整，确保按钮与输入框有一定的间距 */
+}
+/* 响应式处理 */
+@media (max-width: 1200px) {
+  .left-nav {
+    width: 180px; /* 按比例缩小约10% */
+  }
+  body {
+    padding-left: 180px;
+  }
+  .main-function {
+    width: calc(100% - 180px);
+    margin-left: 180px;
+  }
+}
+
+
+/* 左侧导航区 */
+.left-nav li {
+  margin-bottom: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease; /* 新增过渡动画 */
+  border-radius: 4px; /* 新增圆角 */
+  padding: 12px 15px; /* 调整内边距 */
+}
+
+/* 新增悬停效果 */
+.left-nav li:not(.active):not(.disabled):hover {
+  background-color: #e3f2fd; /* 浅蓝色背景 */
+  transform: translateX(4px); /* 右移效果 */
+  box-shadow: 2px 0 6px rgba(33, 150, 243, 0.3); /* 投影效果 */
+}
+
+/* 禁用状态保持原样 */
+.left-nav li.disabled:hover {
+  background-color: inherit;
+  transform: none;
+  box-shadow: none;
+}
+
+/* 激活状态优化 */
+.left-nav li.active {
+  border-left: 3px solid #2196F3; /* 加粗激活指示条 */
+  background-color: #f5fbff; /* 新增浅色背景 */
+}
+
+/* 新增优化对比样式 */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.5);
+}
+
+.modal-content {
+  background-color: #fff;
+  position: absolute;
+  left: 50%;
+  top: 20%;
+  transform: translateX(-50%);
+  width: 80%;
+  min-height: 400px;
+  max-height: 80vh;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  overflow: auto;
+}
+
+/* 关闭按钮样式优化 */
+.close-btn {
+  position: absolute;
+  right: 20px;
+  top: 20px;
+  width: 32px;
+  height: 32px;
+  font-size: 24px;
+  cursor: pointer;
+  background: none;
+  border: none;
+  color: #666;
+  transition: color 0.2s;
+}
+
+.close-btn:hover {
+  color: #333;
+}
+
+.compare-container {
+  display: flex;
+  gap: 20px;
+}
+
+.original-section, .optimized-section {
+  flex: 1;
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.text-content {
+  white-space: pre-wrap;
+}
+
+.diff-added {
+  background-color: #e6ffec;
+}
+
+.diff-removed {
+  background-color: #ffeef0;
+}
+
+.loading-overlay {
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255,255,255,0.9);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.spinner {
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #3498db;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-text {
+  margin-top: 10px;
+  color: #666;
 }
