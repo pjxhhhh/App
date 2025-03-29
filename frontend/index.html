@@ -42,13 +42,40 @@
           <button id="question-analysis-btn" class="active">题目解析</button>
           <button id="outline-assistant-btn">大纲助手</button>
         </div>
+        <!-- 修改题目解析内容区 -->
         <div id="question-analysis-content" class="module-content">
-          <h3>题目解析</h3>
-          <div id="question-result"></div>
+            <div class="tab-content active" id="analysis-module">
+                <div class="result-container">
+                    <!-- 新增用户输入显示区域 -->
+                    <div class="user-input-display">
+                        <h4>你的作文题目</h4>
+                        <pre id="user-input-display"></pre>
+                    </div>
+                    <!-- 原有结果区域 -->
+                    <pre id="question-result"></pre>
+                    <button id="generate-outline-btn" class="floating-btn">下一步</button>
+                </div>
+            </div>
         </div>
         <div id="outline-assistant-content" class="module-content" style="display: none;">
-          <h3>大纲助手</h3>
-          <div id="outline-result"></div>
+            <div class="tab-content active" id="outline-module">
+                <div class="result-container">
+                    <!-- 聊天对话框区域 -->
+                    <div id="outline-chat-container">
+                        <!-- 用户输入显示区域 -->
+                        <div class="user-input-display">
+                            <h4>你的问题</h4>
+                            <pre class="user-message"></pre>
+                        </div>
+                        <!-- AI回复区域 -->
+                        <div class="ai-response-display">
+                            <h4>AI回复</h4>
+                            <pre class="ai-message"></pre>
+                        </div>
+                    </div>
+                    <button id="generate-final-outline-btn" class="floating-btn">生成最终大纲</button>
+                </div>
+            </div>
         </div>
       </div>
       <!-- 下方用户输入区 -->
@@ -72,10 +99,11 @@
     <div class="editor-content">
       <!-- 第一组 -->
       <div class="editor-group">
+        <!-- 修改大纲部分的p标签为div，使其支持HTML内容 -->
         <div class="outline-section">
-          <h4>段落1</h4>
-          <!-- 这里展示大纲内容，由题目解析生成的内容前端缓存带出 -->
-          <p>你可以按照“描述图片与图表简要介绍插图中的场景，包括公园的环境、锻炼的人们</p>
+            <h4>段落1</h4>
+            <!-- 这里展示大纲内容，由题目解析生成的内容前端缓存带出 -->
+            <div class="outline-content"></div>
         </div>
         <div class="writing-section">
           <textarea id="writing-input-1" placeholder="请输入英文内容，翻译大纲内容"></textarea>
@@ -90,7 +118,7 @@
         <div class="outline-section">
           <h4>段落2</h4>
           <!-- 这里展示大纲内容，由题目解析生成的内容前端缓存带出 -->
-          <p>描述柱状图的内,指出公园数量在2020年至2022年间的增长趋势。解释图表的意图分析图表数据所反映的社会现象</p>
+          <div class="outline-content"></div>
         </div>
         <div class="writing-section">
           <textarea id="writing-input-2" placeholder="请输入英文内容，翻译大纲内容"></textarea>
@@ -103,9 +131,9 @@
       <!-- 第三组 -->
       <div class="editor-group">
         <div class="outline-section">
-          <h4>段落3</h4>
-          <!-- 这里展示大纲内容，由题目解析生成的内容前端缓存带出 -->
-          <p>探讨这种变化给当地居民生活带来的积极影响，如提高居民的健康水平、增强社区凝聚力等。个人评论表达你对这一变化的看法；讨论这种变化可能带来的长远影响，例如环境改善、城市形象提升等</p>
+          <h4>段落3</h4>  
+            <!-- 这里展示大纲内容，由题目解析生成的内容前端缓存带出 -->
+            <div class="outline-content"></div>
         </div>
         <div class="writing-section">
           <textarea id="writing-input-3" placeholder="请输入英文内容，翻译大纲内容"></textarea>
