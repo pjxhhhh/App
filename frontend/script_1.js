@@ -47,10 +47,6 @@ const questionAnalysisContent = document.getElementById('question-analysis-conte
 const outlineAssistantContent = document.getElementById('outline-assistant-content');
 
 // 切换模块内容和导航按钮状态
-// 在全局作用域添加当前界面状态变量
-let isOutlineAssistantActive = false;
-
-// 修改模块切换函数
 function switchModule(activeBtn, activeContent) {
   const allBtns = [questionAnalysisBtn, outlineAssistantBtn];
   const allContents = [questionAnalysisContent, outlineAssistantContent];
@@ -60,9 +56,6 @@ function switchModule(activeBtn, activeContent) {
 
   activeBtn.classList.add('active');
   activeContent.style.display = 'block';
-  
-  // 更新当前界面状态
-  isOutlineAssistantActive = activeBtn.id === 'outline-assistant-btn';
 }
 
 // 绑定点击事件
@@ -199,126 +192,55 @@ document.addEventListener('DOMContentLoaded', () => {
 // 提交按钮点击事件
 document.getElementById('submit-btn').addEventListener('click', async () => {
     const input = document.getElementById('user-input-text');
-    const input_content = input.value.trim();
+    const topic = input.value.trim();
     
-    // 更新用户输入显示区域
-    document.getElementById('user-input-display').textContent = input_content;
-    
-    if (!input_content) {
-        alert('请输入内容...');
+    if (!topic) {
+        alert('请输入作文题目');
         return;
     }
-    
-    // 根据当前界面状态选择结果元素
-    const resultElement = isOutlineAssistantActive 
-        ? document.getElementById('outline-result') 
-        : document.getElementById('question-result');
-    // resultElement.textContent = '疯狂思考中......';
-    // resultElement.classList.add('loading-animation');
 
-    // 清空输入框
-    input.value = '';
+    // 新增加载提示
+    const resultElement = document.getElementById('question-result');
+    resultElement.textContent = '疯狂思考中......';
+    resultElement.classList.add('loading-animation');
 
     try {
-        if (isOutlineAssistantActive) {
-            await requestAnalyze(input_content, resultElement);
-        } else {
-            await requestInitialization(input_content, resultElement);
-        }
-    } catch (error) {
-        resultElement.classList.remove('loading-animation');
-        resultElement.innerHTML = `<div class="error-message">请求失败: ${error.message}</div>`;
-    }
-});
-
-// 请求题目解析接口
-async function requestInitialization(input, resultElement) {
-    const response = await fetch('http://localhost:5000/initialization', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({
-            topic: input,
-            user_name: 'current_user'
-        })
-    });
-
-    console.log('HTTP状态码:', response.status);
-
-    const data = await response.json();
-    console.log('完整响应数据:', data);
-    
-    if (data?.status_code === 200 && data?.output?.text) {
-        resultElement.classList.remove('loading-animation');
-        if (typeof marked === 'undefined') {
-            await loadMarked();
-        }
-        resultElement.innerHTML = marked.parse(data.output.text);
-    } else {
-        throw new Error(data?.error_code || '无效的响应结构');
-    }
-}
-
-// 请求大纲分析接口
-// 添加对话消息到聊天容器
-function addChatMessage(role, content) {
-    const container = document.getElementById('outline-chat-container');
-    const messageDiv = document.createElement('div');
-    messageDiv.className = `chat-message ${role}-message`;
-    
-    const header = document.createElement('h4');
-    header.textContent = role === 'user' ? '你的问题' : 'AI回复';
-    
-    const contentPre = document.createElement('pre');
-    contentPre.textContent = content;
-    
-    messageDiv.appendChild(header);
-    messageDiv.appendChild(contentPre);
-    container.appendChild(messageDiv);
-    
-    // 滚动到底部
-    container.scrollTop = container.scrollHeight;
-}
-
-// 修改requestAnalyze函数
-async function requestAnalyze(input, resultElement, showUserMessage = true) {
-    // 检查是否有问题解析结果
-    question_result = document.getElementById('question-result').textContent
-    if (question_result == "") {
-        alert("请先完成题目解析")
-        throw new Error("请先完成题目解析");
-    }
-
-    // 先显示用户消息
-    if (showUserMessage) {
-        addChatMessage('user', input);
-    }
-
-    try {
-        const response = await fetch('http://localhost:5000/analyze', {
+        const response = await fetch('http://localhost:5000/initialization', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({
-                topic: "请结合当前的环境分析一下人工智能对未来就业的影响",
-                message: question_result,
-                input: input,
+                topic: topic,
                 user_name: 'current_user'
             })
         });
         
+        // 新增响应状态日志
+        console.log('HTTP状态码:', response.status);
+        
         const data = await response.json();
         console.log('完整响应数据:', data);
         
+        // 添加数据结构校验
         if (data?.status_code === 200 && data?.output?.text) {
-            // 显示AI回复
-            addChatMessage('ai', data.output.text);
+            resultElement.classList.remove('loading-animation');
+            // 确保marked.js已加载
+            if (typeof marked === 'undefined') {
+                await loadMarked();
+            }
+            resultElement.innerHTML = marked.parse(data.output.text);
         } else {
             throw new Error(data?.error_code || '无效的响应结构');
         }
-        return true;
+        
     } catch (error) {
-        addChatMessage('ai', `请求失败: ${error.message}`);
+        resultElement.classList.remove('loading-animation');
+        console.error('完整错误信息:', {
+            error: error.message,
+            stack: error.stack
+        });
+        resultElement.innerHTML = `<div class="error-message">请求失败: ${error.message}</div>`;
     }
-}
+});
 
 // 动态加载marked.js
 async function loadMarked() {
@@ -333,11 +255,6 @@ async function loadMarked() {
 
 // 在DOM加载完成后添加事件监听
 document.addEventListener('DOMContentLoaded', () => {
-    // 默认显示题目解析栏
-    document.getElementById('question-analysis-interface').style.display = 'flex';
-    document.getElementById('question-analysis-content').style.display = 'block';
-    document.getElementById('question-analysis-btn').classList.add('active');
-    
     // 获取按钮和模块元素
     const outlineBtn = document.getElementById('generate-outline-btn');
     const questionAnalysisBtn = document.getElementById('question-analysis-btn');
@@ -346,21 +263,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const outlineContent = document.getElementById('outline-assistant-content');
 
     // 下一步按钮点击事件
-    outlineBtn.addEventListener('click', async () => {
-        try {
-            // 清空聊天对话框
-            document.getElementById('outline-chat-container').innerHTML = '';
-
-            // 发起空输入的分析请求
-            await requestAnalyze('请开始逐步引导我进行苏格拉底式思考', document.getElementById('outline-result'), false);
-
-            // console.log('分析结果:', result);
-
-            // 切换到"大纲助手"标签
-            outlineAssistantBtn.click();
-        } catch (error) {
-            addChatMessage('ai', `自动分析失败: ${error.message}`);
-        }
+    outlineBtn.addEventListener('click', () => {
+        // 切换到"大纲助手"标签
+        outlineAssistantBtn.click();
+        
+        // 显示欢迎消息
+        document.querySelector('#outline-assistant-content .welcome-message').style.display = 'block';
     });
 
     // 题目解析按钮点击事件
@@ -379,80 +287,6 @@ document.addEventListener('DOMContentLoaded', () => {
         questionContent.style.display = 'none';
     });
 });
-
-// 绑定生成最终大纲按钮的点击事件
-document.getElementById('generate-final-outline-btn').addEventListener('click', async function() {
-    try {
-        // 获取合并后的内容：用户输入显示 + 题目解析结果
-        const userInput = document.getElementById('user-input-display').textContent;
-        const questionResult = document.getElementById('question-result').textContent;
-        const combinedContent = `${userInput}\n\n${questionResult}`;
-
-        console.log('合并后的内容:', combinedContent);
-        
-        const user_name = 'current_user'; // 这里应该从登录状态获取实际用户名
-        
-        // 调用/outline接口
-        const response = await fetch('http://localhost:5000/outline', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                content: combinedContent,
-                user_name: user_name
-            })
-        });
-        
-        const result = await response.json();
-        
-        if (response.ok) {
-            // 解析返回的大纲内容
-            const outlineText = result.output.text;
-
-            console.log('生成的大纲:', outlineText);
-            
-            // 使用正则表达式分割大纲内容
-            const sections = outlineText.split(/🔹\s*\*{2}[^\*]+\*{2}/g).slice(1);
-
-            console.log('分割后的大纲段落:', sections.length);
-
-            if (typeof marked === 'undefined') {
-              await loadMarked();
-            }
-            
-            // 更新三个段落的内容
-            if (sections.length >= 1) {
-              console.log('更新第一段内容:', sections[0]);
-                document.querySelector('#essay-editor-module .editor-group:nth-child(1) .outline-section .outline-content').innerHTML = 
-                    marked.parse(sections[0].trim());
-            }
-            if (sections.length >= 2) {
-              console.log('更新第一段内容:', sections[1]);
-                document.querySelector('#essay-editor-module .editor-group:nth-child(2) .outline-section .outline-content').innerHTML = 
-                    // sections[1].replace(/\*\*[^\*]+\*\*|`/g, '').trim();
-                    marked.parse(sections[1].trim());
-            }
-            if (sections.length >= 3) {
-              console.log('更新第一段内容:', sections[2]);
-                document.querySelector('#essay-editor-module .editor-group:nth-child(3) .outline-section .outline-content').innerHTML = 
-                    // sections[2].replace(/\*\*[^\*]+\*\*|`/g, '').trim();
-                    marked.parse(sections[2].trim());
-            }
-            
-            // 显示作文编辑模块
-            document.getElementById('essay-editor-module').style.display = 'block';
-            document.getElementById('question-analysis-interface').style.display = 'none';
-        } else {
-            alert('生成大纲失败: ' + (result.error || '未知错误'));
-        }
-    } catch (error) {
-        console.error('生成大纲失败:', error);
-        alert('生成大纲失败，请重试');
-    }
-});
-
-// 智能评分
 
 // 初始化评分系统
 const scoreModal = document.getElementById('score-modal');

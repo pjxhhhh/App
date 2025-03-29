@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>三栏式布局应用</title>
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles_1.css">
 </head>
 
 <body>
@@ -44,35 +44,20 @@
         </div>
         <!-- 修改题目解析内容区 -->
         <div id="question-analysis-content" class="module-content">
-            <div class="tab-content active" id="analysis-module">
+            <h3>题目解析</h3>
+            <!-- <div class="tab-content active" id="analysis-module"> -->
                 <div class="result-container">
-                    <!-- 新增用户输入显示区域 -->
-                    <div class="user-input-display">
-                        <h4>你的作文题目</h4>
-                        <pre id="user-input-display"></pre>
-                    </div>
-                    <!-- 原有结果区域 -->
                     <pre id="question-result"></pre>
                     <button id="generate-outline-btn" class="floating-btn">下一步</button>
                 </div>
-            </div>
+            <!-- </div> -->
         </div>
         <div id="outline-assistant-content" class="module-content" style="display: none;">
+            <h3>大纲助手</h3>
+            <div class="welcome-message">你现在可以提问关于题目大纲的问题啦~</div>
             <div class="tab-content active" id="outline-module">
                 <div class="result-container">
-                    <!-- 聊天对话框区域 -->
-                    <div id="outline-chat-container">
-                        <!-- 用户输入显示区域 -->
-                        <div class="user-input-display">
-                            <h4>你的问题</h4>
-                            <pre class="user-message"></pre>
-                        </div>
-                        <!-- AI回复区域 -->
-                        <div class="ai-response-display">
-                            <h4>AI回复</h4>
-                            <pre class="ai-message"></pre>
-                        </div>
-                    </div>
+                    <pre id="outline-result"></pre>
                     <button id="generate-final-outline-btn" class="floating-btn">生成最终大纲</button>
                 </div>
             </div>
@@ -192,7 +177,7 @@
   </div>
   
 
-  <script src="script.js"></script>
+  <script src="script_1.js"></script>
 </body>
 
 </html>
