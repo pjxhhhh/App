@@ -17,7 +17,7 @@ import configparser  # 新增导入
 
 # 新增配置加载代码
 config = configparser.ConfigParser()
-config.read('env.conf')  # 修改为相对路径
+config.read('./backend/env.conf')  # 修改为相对路径
 
 app = Flask(__name__)
 CORS(app)
@@ -378,8 +378,8 @@ def analyze_topic():
         # TODO: 保存生成结果
         # insert_message(user, 'user', 0, content_topic, response.output.text)
 
-        return mock_initialization()
-        # return build_response(response)
+        # return mock_initialization()
+        return build_response(response)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
@@ -413,8 +413,8 @@ def generate_outline():
         # 保存生成结果
         # insert_message(user.id, 'assistant', 0, topic, response.output.text)
 
-        return mock_ouline()
-        # return build_response(response)
+        # return mock_ouline()
+        return build_response(response)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
@@ -791,4 +791,4 @@ def mock_response(text):
 
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+    app.run(debug=False, host='0.0.0.0', port=5000)

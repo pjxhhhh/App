@@ -435,20 +435,31 @@ document.getElementById('generate-final-outline-btn').addEventListener('click', 
             // 更新三个段落的内容
             if (sections.length >= 1) {
               console.log('更新第一段内容:', sections[0]);
-                document.querySelector('#essay-editor-module .editor-group:nth-child(1) .outline-section .outline-content').innerHTML = 
-                    marked.parse(sections[0].trim());
+              const outlineContent = document.getElementById('outline-content-1');
+              if (outlineContent) {
+                outlineContent.innerHTML = marked.parse(sections[0].trim());
+              } else {
+                console.error('找不到outline-content-1元素');
+              }
+              console.log('更新第一段内容 done:', sections[0]);
             }
             if (sections.length >= 2) {
-              console.log('更新第一段内容:', sections[1]);
-                document.querySelector('#essay-editor-module .editor-group:nth-child(2) .outline-section .outline-content').innerHTML = 
-                    // sections[1].replace(/\*\*[^\*]+\*\*|`/g, '').trim();
-                    marked.parse(sections[1].trim());
+              console.log('更新第二段内容:', sections[1]);
+              const outlineContent = document.getElementById('outline-content-2');
+              if (outlineContent) {
+                outlineContent.innerHTML = marked.parse(sections[1].trim());
+              } else {
+                console.error('找不到outline-content-2元素');
+              }
             }
             if (sections.length >= 3) {
-              console.log('更新第一段内容:', sections[2]);
-                document.querySelector('#essay-editor-module .editor-group:nth-child(3) .outline-section .outline-content').innerHTML = 
-                    // sections[2].replace(/\*\*[^\*]+\*\*|`/g, '').trim();
-                    marked.parse(sections[2].trim());
+              console.log('更新第三段内容:', sections[2]);
+              const outlineContent = document.getElementById('outline-content-3');
+              if (outlineContent) {
+                outlineContent.innerHTML = marked.parse(sections[2].trim());
+              } else {
+                console.error('找不到outline-content-3元素');
+              }
             }
             
             // 显示作文编辑模块
