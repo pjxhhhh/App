@@ -11,7 +11,7 @@
 <body>
   <!-- 左侧导航区 -->
   <div class="left-nav">
-    <h2>功能导航</h2>
+    <!-- <h2>功能导航</h2> -->
     <ul>
       <li id="question-analysis">题目解析</li>
       <li id="essay-editor">作文编辑工作台</li>
@@ -22,9 +22,9 @@
   <div id="question-analysis-interface" style="display: none;">
     <!-- 历史会话区 -->
     <div class="history-session">
-      <h2>历史会话</h2>
+      <h2>考点突破轨迹</h2>
       <input type="text" id="search-input" placeholder="按题目类型或题目模糊搜索">
-      <div id="session-list">
+      <div id="session-list" style="font-size: 0.9em;">
         <div class="tag">图表类</div>
         <div class="session" data-title="图表类作文标题1">会话记录 1 - 图表类</div>
         <div class="session" data-title="图表类作文标题2">会话记录 2 - 图表类</div>
@@ -35,7 +35,7 @@
     <!-- Agent 对话区 -->
     <div class="agent-dialog">
       <!-- 顶部欢迎语 -->
-      <div class="welcome-message">Hi~我是你的考研助手</div>
+      <div class="welcome-message">欢迎开启智慧备考！我是你的AI考研助手，支持「题目解析」「大纲生成」「段落优化」「AI打分的功能哦」,一键开启体验之旅</div>
       <!-- 中间内容生成区 -->
       <div class="content-generation">
         <div class="module-nav">
@@ -44,18 +44,19 @@
         </div>
         <!-- 修改题目解析内容区 -->
         <div id="question-analysis-content" class="module-content">
-            <div class="tab-content active" id="analysis-module">
+            <!-- <div class="tab-content active" id="analysis-module"> -->
                 <div class="result-container">
                     <!-- 新增用户输入显示区域 -->
                     <div class="user-input-display">
-                        <h4>你的作文题目</h4>
+                        <h4 style="margin: 0 0 4px 0;">作文题目</h4>
                         <pre id="user-input-display"></pre>
                     </div>
                     <!-- 原有结果区域 -->
+                    <h4 style="margin: 0 0 4px 0;">解析框架</h4>
                     <pre id="question-result"></pre>
                     <button id="generate-outline-btn" class="floating-btn">下一步</button>
                 </div>
-            </div>
+            <!-- </div> -->
         </div>
         <div id="outline-assistant-content" class="module-content" style="display: none;">
             <div class="tab-content active" id="outline-module">
@@ -64,12 +65,12 @@
                     <div id="outline-chat-container">
                         <!-- 用户输入显示区域 -->
                         <div class="user-input-display">
-                            <h4>你的问题</h4>
+                            <h4 style="margin: 0 0 4px 0;">你的问题</h4>
                             <pre class="user-message"></pre>
                         </div>
                         <!-- AI回复区域 -->
                         <div class="ai-response-display">
-                            <h4>AI回复</h4>
+                            <h4 style="margin: 0 0 4px 0;">AI回复</h4>
                             <pre class="ai-message"></pre>
                         </div>
                     </div>
@@ -82,19 +83,20 @@
       <div class="user-input">
         <textarea id="user-input-text" placeholder="请输入作文题目或上传图片"></textarea>
         <input type="file" id="image-upload" accept="image/*">
-        <select id="model-select">
+        <!-- <select id="model-select">
           <option value="model1">模型 1</option>
           <option value="model2">模型 2</option>
-        </select>
-        <button id="search-online">联网搜索</button>
+        </select> -->
+        <!-- <button id="search-online">联网搜索</button> -->
         <button id="submit-btn">提交 <i class="arrow"></i></button>
       </div>
     </div>
   </div>
   <!-- 其他功能模块 -->
+  <!-- 作文编辑工作台 -->
   <div id="essay-editor-module" style="display: none;">
-    <div class="editor-header">
-      <h3>HI,我是你的考研小助手</h3>
+    <div class="welcome-message">
+      欢迎开启智慧备考！我是你的AI考研助手，支持「题目解析」「大纲生成」「段落优化」「AI打分」功能，一键开启体验之旅
     </div>
     <div class="editor-content">
       <!-- 全局控制栏 -->
