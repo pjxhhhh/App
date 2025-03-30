@@ -1,9 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from enum import CONTINUOUS
-from re import T
-import re
-from types import resolve_bases
+
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required
@@ -11,9 +8,9 @@ import dashscope
 from dashscope import Generation
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
-import os
+from sqlalchemy import func
 from datetime import datetime
-import configparser  # 新增导入
+import configparser
 
 # 新增配置加载代码
 config = configparser.ConfigParser()
@@ -45,13 +42,14 @@ class Message(db.Model):
     user_id = db.Column(db.String(36), db.ForeignKey('user.id'), index=True)
     role = db.Column(db.String(10))
     chat_num = db.Column(db.Integer)
+    request_type = db.Column(db.String(20))
     request_content = db.Column(db.Text)
     response_content = db.Column(db.Text)
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
 
 class MessageSchema(ma.Schema):
     class Meta:
-        fields = ('id', 'user_id', 'role', 'chat_num', 'request_content', 'response_content', 'timestamp')
+        fields = ('id', 'user_id', 'role', 'chat_num', 'request_type', 'request_content', 'response_content', 'timestamp')
 
 user_schema = UserSchema()
 users_schema = UserSchema(many=True)
@@ -59,6 +57,7 @@ message_schema = MessageSchema()
 messages_schema = MessageSchema(many=True)
 
 with app.app_context():
+    db.drop_all()
     db.create_all()
 
 # 确保配置文件存在且包含所需section
@@ -191,7 +190,7 @@ anaylyze_promote = '''以下是中文版苏格拉底式考研英语作文辅导�
 
 
 ## 3. 确认生成大纲
-outline_promote = '''作为考研英语写作专家，请根据以下题目生成标准的三段式作文大纲：
+outline_promote = '''作为考研英语写作专家，请根据以下题目严格生成标准的三段式作文大纲：
 1. 结构要求：
    - 三段式：现象描述→原因分析→结论建议
 2. 每段需包含：
@@ -202,7 +201,24 @@ outline_promote = '''作为考研英语写作专家，请根据以下题目生�
 3. 格式要求：
    - 使用Markdown列表格式
    - 段首用🔹符号标注
-   - 关键术语加粗'''
+   - 关键术语加粗
+   
+示例:
+🔹 **第一段：现象描述**  
+- **核心功能定位**：数据呈现与现状概述  
+- **字数范围**：80-120词  
+- **解析**：首先通过描述人工智能技术的快速发展及其在各行业的广泛应用，引出其对就业市场的深远影响。可以使用具体数据（如某行业自动化程度提升的比例）或案例（如某些岗位被机器取代的具体实例）来支撑观点。建议引用权威报告或研究结果，比如“根据麦肯锡的预测”，并使用学术化表达如“显著改变劳动力市场格局”。  
+
+🔹 **第二段：原因分析**  
+- **核心功能定位**：理论论证与逻辑分析  
+- **字数范围**：80-120词  
+- **解析**：从技术进步、经济需求和教育体系三个维度深入探讨人工智能如何重塑就业市场。例如，可以从技术角度解释为什么某些重复性工作更容易被替代（如“由于算法的高效性”），同时讨论新兴岗位的产生（如“催生了数据分析等高技能职业”）。此外，可引入“结构性失业”的概念，并用学术化的语言阐述其背后的逻辑链条。  
+
+🔹 **第三段：结论建议**  
+- **核心功能定位**：总结归纳与对策建议  
+- **字数范围**：80-120词  
+- **解析**：总结人工智能对就业的双重影响（机遇与挑战并存），提出应对策略。例如，强调终身学习的重要性（如“推动终身教育体系的发展”），并呼吁政府、企业和个人共同协作以适应变化（如“构建人机协同的工作模式”）。最后，可以用展望式的表述收尾，比如“人工智能将为未来就业带来无限可能”。  
+'''
 
 # 构建优化提示
 optimize_promote = '''
@@ -239,9 +255,6 @@ While social media emerges as a double-edged sword enabling effortless global co
 修正中式英语："become lonely" → "experience existential isolation"
 '''
 
-# anaylyze_promote = '''作为考研英语写作专家，请针对这个考研英语作文题目{}，结合这样的分析{},对用户的作文进行点评分析并提供引导性思考: {}。'''
-
-
 def insert_user(user_name):
     user = User(username=user_name)
     db.session.add(user)
@@ -258,11 +271,12 @@ def get_user(user_name, need_create=False, allow_empty=False):
         return jsonify({'error': 'User not found: {}'.format(user_name)}), 404
     return user
 
-def insert_message(user_id, role, chat_num, request_content, response_content):
+def insert_message(user_id, role, chat_num, request_type, request_content, response_content):
     message = Message(
         user_id=user_id,
         role=role,
         chat_num=chat_num,
+        request_type=request_type,
         request_content=request_content,
         response_content=response_content,
         timestamp=datetime.now()
@@ -275,10 +289,14 @@ def get_user_conversations(user_id):
     messages = Message.query.filter_by(user_id=user_id).order_by(Message.timestamp.asc()).all()
     return messages
 
-def get_user_message_max_chat_num(user_id):
-    # messages = Message.query.filter_by(user_id=user_id).order_by(Message.chat_num.desc()).first()
-    messages = Message.query.filter_by(user_id=user_id).max(Message.chat_num)
-    return messages.chat_num if messages else 0
+def get_user_message_max_chat_num(user_id, req_type = "analyze"):
+    max_chat_num = db.session.query(
+        func.max(Message.chat_num)
+    ).filter(
+        Message.user_id == user_id,
+        Message.request_type == req_type
+    ).scalar()
+    return max_chat_num if max_chat_num is not None else 0
 
 @app.route('/')
 def index():
@@ -323,6 +341,9 @@ def add_message():
     chat_num = data.get('chat_num')
     if not chat_num:
         return jsonify({'error': 'Missing chat_num parameter'}), 400
+    request_type = data.get('request_type')  # 新增参数检查
+    if not request_type:
+        return jsonify({'error': 'Missing request_type parameter'}), 400
     request_content = data.get('request_content')
     if not request_content:
         return jsonify({'error': 'Missing request_content parameter'}), 400
@@ -331,11 +352,11 @@ def add_message():
         return jsonify({'error': 'Missing response_content parameter'}), 400
 
     user = get_user(user_name, need_create=True, allow_empty=False)
-    if isinstance(user, User):  # 明确检查是否是User实例
-        message = insert_message(user.id, role, chat_num, request_content, response_content)
-        return jsonify({'message': 'Message added successfully'}), 201
+    if not isinstance(user, User):
+        raise Exception("user is not User")
     else:
-        return user  # 直接返回get_user的错误响应
+        message = insert_message(user.id, role, chat_num, request_type, request_content, response_content)
+        return jsonify({'message': 'Message added successfully'}), 201
 
 @app.route('/list_messages', methods=['GET'])
 def list_messages():
@@ -345,7 +366,7 @@ def list_messages():
     return jsonify(messages_schema.dump(messages))
 
 @app.route('/initialization', methods=['POST'])
-def analyze_topic():
+def initialization():
     print("request headers: ", request.headers)
     if request.headers.get('Content-Type') != 'application/json':
         return jsonify({'error': 'Unsupported Media Type: Content-Type must be application/json'}), 415
@@ -355,7 +376,6 @@ def analyze_topic():
     #     print("has image: ", type(image))
 
     data = request.get_json()
-    print("updata data: ", data)
     content_topic = data.get('topic')
     if not content_topic:
         return jsonify({'error': 'Missing topic parameter'}), 400
@@ -367,16 +387,19 @@ def analyze_topic():
 
     # 检查用户是否存在，如果不存在则创建用户
     user = get_user(user_name, need_create=True, allow_empty=False)
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+
+    router_name = request.endpoint.split('.')[-1]
+    print("init router name: ", router_name)
     
     # 调用DeepSeek API进行分析
     try:
         print("initialize api start: ", content_topic)
         response = call_generation_api("qwen-turbo", initialization_promote, content_topic)
 
-        # print("response: ", response)
-
-        # TODO: 保存生成结果
-        # insert_message(user, 'user', 0, content_topic, response.output.text)
+        assert isinstance(user, User)
+        insert_message(user.id, 'user', 0, router_name, content_topic, response.output.text)
 
         # return mock_initialization()
         return build_response(response)
@@ -385,7 +408,7 @@ def analyze_topic():
 
 # 添加新的路由端点
 @app.route('/outline', methods=['POST'])
-def generate_outline():
+def outline():
     if request.headers.get('Content-Type') != 'application/json':
         return jsonify({'error': 'Unsupported Media Type'}), 415
 
@@ -404,6 +427,9 @@ def generate_outline():
     if not user:
         return jsonify({'error': 'User not found'}), 404
 
+    router_name = request.endpoint.split('.')[-1]
+    print("outline router name: ", router_name)
+
     try:
         # 调用DeepSeek API
         response = call_generation_api("qwen-turbo", outline_promote, content)
@@ -411,7 +437,8 @@ def generate_outline():
         print("outline api response: ", response)
 
         # 保存生成结果
-        # insert_message(user.id, 'assistant', 0, topic, response.output.text)
+        assert isinstance(user, User)
+        insert_message(user.id, 'user', 0, router_name, content, response.output.text)
 
         # return mock_ouline()
         return build_response(response)
@@ -420,8 +447,6 @@ def generate_outline():
 
 @app.route('/analyze', methods=['POST'])
 def analyze():
-
-    print("analyze api start")
     if request.headers.get('Content-Type') != 'application/json':
         return jsonify({'error': 'Unsupported Media Type'}), 415
 
@@ -451,57 +476,47 @@ def analyze():
 
     print("analyze api request: ", data)
 
-    # # 检查用户是否存在
-    # user_name = data.get('user_name')
-    # if not user_name:
-    #     return jsonify({'error': 'Missing user_name parameter'}), 400
+    # 检查用户是否存在
+    user_name = data.get('user_name')
+    if not user_name:
+        return jsonify({'error': 'Missing user_name parameter'}), 400
     
-    # # 修正点：通过查询获取用户对象
-    # user = User.query.filter_by(username=user_name).first()
-    # if not user:
-    #     return jsonify({'error': 'User not found: {}'.format(user_name)}), 404
-    # user_id = user.id  # 正确获取标量用户ID
-    user_id = "aaa"
+    # 修正点：通过查询获取用户对象
+    user = User.query.filter_by(username=user_name).first()
+    if not user:
+        return jsonify({'error': 'User not found: {}'.format(user_name)}), 404
 
-    # # 创建新消息记录
-    # new_message = Message(
-    #     user_id=user_id,  # 使用标量值
-    #     role='user',
-    #     request_content=data['message'],
-    #     response_content='',
-    #     timestamp=datetime.utcnow()
-    # )
-    # db.session.add(new_message)
-    # db.session.commit()
+    user_id = user.id  # 正确获取标量用户ID
 
-    # 修正点：确保获取的是整型数值
-    # current_chat_num = get_user_message_max_chat_num(user_id) + 1
-    current_chat_num = 1
-    tmp_content = anaylyze_promote.format(content_topic, message, current_chat_num)
+    current_chat_num = get_user_message_max_chat_num(user_id) + 1
 
-    # 检查对话轮次
-    if current_chat_num >= 10:
-        # 触发总结逻辑
-        tmp_content = "请总结之前的对话并生成最终作文框架"
-        try:
-            response = Generation.call(
-                model='qwen-turbo',
-                messages=[{"role": "system", "content": tmp_content}] # + user_conversations[user_id]
-            )
-            # 清空对话历史
-            # 删除旧消息
-            Message.query.filter_by(user_id=user_id).delete()
-            db.session.commit()
-            return jsonify({
-                'status_code': response.status_code,
-                'data': {
-                    'summary': response.output.text,
-                    'message': '对话已达10轮，以下是最终框架'
-                }
-            })
-        except Exception as e:
-            return jsonify({'error': str(e)}), 500
+    router_name = request.endpoint.split('.')[-1]
+    print("analyze router name: ", router_name)
 
+    # # 检查对话轮次
+    # if current_chat_num >= 10:
+    #     # 触发总结逻辑
+    #     tmp_content = "请总结之前的对话并生成最终作文框架"
+    #     try:
+    #         response = Generation.call(
+    #             model='qwen-turbo',
+    #             messages=[{"role": "system", "content": tmp_content}] # + user_conversations[user_id]
+    #         )
+    #         # 清空对话历史
+    #         # 删除旧消息
+    #         Message.query.filter_by(user_id=user_id).delete()
+    #         db.session.commit()
+    #         return jsonify({
+    #             'status_code': response.status_code,
+    #             'data': {
+    #                 'summary': response.output.text,
+    #                 'message': '对话已达10轮，以下是最终框架'
+    #             }
+    #         })
+    #     except Exception as e:
+    #         return jsonify({'error': str(e)}), 500
+
+    print("analyze api current chat num: ", current_chat_num, "; user_id: ", user_id, "; user_name: ", user_name)
     system_content = anaylyze_promote.format(content_topic, message, current_chat_num)
 
     # 正常处理对话
@@ -511,7 +526,7 @@ def analyze():
         print("analyze api response: ", response)
 
         # 添加助手回复
-        # insert_message(user_id, 'assistant', current_chat_num, request_content=message, response_content=response.output.text)
+        insert_message(user_id, 'assistant', current_chat_num, router_name, message, response.output.text)
         
         return build_response(response)
     except Exception as e:
@@ -526,11 +541,6 @@ def optimize():
     data = request.get_json()
     if not data:
         return jsonify({'error': 'Missing data'}), 400
-
-    # # 获取用户提供的作文题目
-    # topic = data.get('topic')
-    # if not topic:
-    #     return jsonify({'error': 'Missing topic parameter'}), 400
 
     # 获取当前段落的分析
     analysis = data.get('analysis')
@@ -554,27 +564,17 @@ def optimize():
 
     user_id = user.id
 
-    total_input = "我的段落分析是{}, 我的作文段落是{}".format(analysis, paragraph)
+    router_name = request.endpoint.split('.')[-1]
+    print("optimze router name: ", router_name)
+    current_chat_num = get_user_message_max_chat_num(user_id, "optimize") + 1
 
-    # total_content = optimize_promote.format(topic, analysis, paragraph, get_user_message_max_chat_num(user_id) + 1)
-    # total_content = optimize_promote.format(topic, analysis, paragraph, 1)
+    total_input = "我的段落分析是{}, 我的作文段落是{}".format(analysis, paragraph)
 
     try:
         # 调用DeepSeek API进行优化
         response = call_generation_api("qwen-turbo", optimize_promote, total_input)
-        # response = Generation.call(
-        #     model='qwen-turbo',
-        #     messages=[
-        #         {
-        #             'role': 'system',
-        #             'content': total_content
-        #         }
-        #     ]
-        # )
 
-        # TODO: delete
-        # 保存优化结果到数据库
-        # insert_message(user_id, 'assistant', get_user_message_max_chat_num(user_id) + 1, paragraph, response.output.text)
+        insert_message(user_id, 'user', current_chat_num, router_name, paragraph, response.output.text)
 
         print("optimize api response: ", response)
 
