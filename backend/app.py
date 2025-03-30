@@ -13,6 +13,11 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 import os
 from datetime import datetime
+import configparser  # 新增导入
+
+# 新增配置加载代码
+config = configparser.ConfigParser()
+config.read('env.conf')  # 修改为相对路径
 
 app = Flask(__name__)
 CORS(app)
@@ -56,9 +61,19 @@ messages_schema = MessageSchema(many=True)
 with app.app_context():
     db.create_all()
 
-# DEEPSEEK_API_KEY = os.getenv('DEEPSEEK_API_KEY', 'sk-f06f42694798425bb1171b1fae730b58')
+# 确保配置文件存在且包含所需section
+if not config.has_section('api_key'):
+    raise ValueError("配置文件缺少[api_key]部分")
 
-dashscope.api_key = 'sk-d998dcc59c7349be944c4ca2aabcb6f2'
+# 修改为安全获取配置项，不存在则跳过
+DEEPSEEK_API_KEY = config.get('api_key', 'DEEPSEEK_API_KEY', fallback=None)
+dashscope.api_key = config.get('api_key', 'DASHSCOPE_API_KEY', fallback=None)
+
+# 可选：添加调试输出
+if DEEPSEEK_API_KEY is None:
+    print("警告：未配置DEEPSEEK_API_KEY")
+if dashscope.api_key is None:
+    print("警告：未配置DASHSCOPE_API_KEY")
 
 user_conversations = dict()
 
@@ -710,7 +725,7 @@ def mock_initialization():
 低技能劳动者受到的冲击尤为明显，他们更容易被自动化系统取代。与此同时，高技能人才则可以通过掌握AI相关技能受益，从而加剧社会不平等。这种“技能鸿沟”需要引起广泛关注。  
 （3）解决方案段
 ① 政策层面：加强职业教育培训
-各国政府应加大对劳动者技能培训的投资力度，尤其是在AI相关的技术领域。例如，德国推行的“双元制”职业教育体系，帮助工人适应新技术需求，值得借鉴。  
+各国政府应加大劳动者技能培训的投资力度，尤其是在AI相关的技术领域。例如，德国推行的“双元制”职业教育体系，帮助工人适应新技术需求，值得借鉴。  
 ② 企业层面：推动人机协作
 企业在引入AI时应注重人机协同，而非单纯追求效率最大化。通过合理分配任务，让人类专注于创造性工作，而机器负责重复性劳动，可以实现双赢局面。  
 ③ 个人层面：终身学习理念
