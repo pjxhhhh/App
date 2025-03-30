@@ -119,6 +119,17 @@ function initOptimize() {
       const textarea = btn.closest('.writing-section').querySelector('textarea');
       const originalText = textarea.value;
 
+      // 检查文本是否为空
+      if (!originalText) {
+        alert('请输入需要优化的内容');
+        return;
+      }
+
+      const paragraph = textarea.id.replace('writing-input-', ''); // 获取段落编号
+
+      console.log('原始文本:', originalText);
+      console.log('段落编号:', paragraph);
+
       // 显示弹窗
       modal.style.display = 'block';
       document.getElementById('original-text').textContent = originalText;
@@ -133,13 +144,35 @@ function initOptimize() {
       }, 10000); // 10秒超时
 
       try {
-        // 调用AI优化服务
-        const optimizedText = await callAIOptimizeService(originalText);
-        clearTimeout(timeoutId);
+        // 调用优化接口
+        const response = await fetch('http://localhost:5000/optimize', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            analysis: "你可以按照“描述图片与图表简要介绍插图中的场景，包括公园的环境、锻炼的人们",
+            paragraph: originalText,
+            user_name: 'current_user'
+          })
+        });
 
-        // 显示优化结果
+        if (!response.ok) {
+          throw new Error(data.error || '优化请求失败');
+        }
+
+        const data = await response.json();
+        const optimized_text = data.output.text;
+        console.log("接口调用成功 2: ", data)
+
+        clearTimeout(timeoutId);
         loadingOverlay.style.display = 'none';
-        showDiff(originalText, optimizedText);
+        
+        // 使用marked渲染优化结果
+        if (typeof marked === 'undefined') {
+            await loadMarked();
+        }
+        document.getElementById('optimized-text').innerHTML = marked.parse(optimized_text);
       } catch (error) {
         clearTimeout(timeoutId);
         loadingOverlay.style.display = 'none';
@@ -167,28 +200,6 @@ function initOptimize() {
       modal.style.display = 'none';
     }
   });
-}
-
-// 显示文本差异
-function showDiff(original, optimized) {
-  const diff = Diff.diffWords(original, optimized);
-  const originalHtml = [];
-  const optimizedHtml = [];
-
-  diff.forEach(part => {
-    const value = part.value.replace(/\n/g, '<br>');
-    if (part.added) {
-      optimizedHtml.push(`<span class="diff-added">${value}</span>`);
-    } else if (part.removed) {
-      originalHtml.push(`<span class="diff-removed">${value}</span>`);
-    } else {
-      originalHtml.push(value);
-      optimizedHtml.push(value);
-    }
-  });
-
-  document.getElementById('original-text').innerHTML = originalHtml.join('');
-  document.getElementById('optimized-text').innerHTML = optimizedHtml.join('');
 }
 
 // 初始化
@@ -589,9 +600,16 @@ function highlightKeywords(text) {
 
 // 替换原文
 replaceBtn.addEventListener('click', () => {
+  const optimizedText = document.getElementById('optimized-text');
   const writingInput = document.querySelector('.writing-section textarea');
-  writingInput.value = optimizedText.textContent;
-  optimizeModal.style.display = 'none';
+
+  console.log('优化后的内容:', optimizedText.textContent)
+  
+  // 添加确认弹窗
+  if (confirm('确定要用优化后的内容替换原文吗？')) {
+    writingInput.value = optimizedText.textContent;
+    optimizeModal.style.display = 'none';
+  }
 });
 
 // 重新生成

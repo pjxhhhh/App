@@ -204,8 +204,25 @@ optimize_promote = '''
 修正中式英语表达（标注并解释修改原因）
 优化文化差异导致的语义模糊
 添加英语母语者常用修辞（隐喻/提喻/转喻）
-示例
-请注意你需要在最多十论对话内完成,当前是第{}轮。'''
+
+示例如下：
+用户输入：
+"Social media let us communicate easy. But some people become lonely. We should find balance."
+1. 优化结果：
+While social media emerges as a double-edged sword enabling effortless global communication, platforms having revolutionized interaction paradoxically breed isolation. Statistical evidence reveals 68% of frequent users experience existential isolation. Striking a delicate equilibrium between digital engagement and authentic connections thus becomes imperative.
+2. 核心优化：
+（1）语法升级
+倒装结构："Not only does social media enable..."
+独立主格："platforms having revolutionized..."
+虚拟语气："Were we to overindulge..."
+（2）学术替换
+"easy" → "effortlessly"
+"find balance" → "strike a delicate equilibrium"
+加分短语："exert far-reaching impacts"
+（3）文化适配
+隐喻修辞："digital double-edged sword"
+修正中式英语："become lonely" → "experience existential isolation"
+'''
 
 # anaylyze_promote = '''作为考研英语写作专家，请针对这个考研英语作文题目{}，结合这样的分析{},对用户的作文进行点评分析并提供引导性思考: {}。'''
 
@@ -495,10 +512,10 @@ def optimize():
     if not data:
         return jsonify({'error': 'Missing data'}), 400
 
-    # 获取用户提供的作文题目
-    topic = data.get('topic')
-    if not topic:
-        return jsonify({'error': 'Missing topic parameter'}), 400
+    # # 获取用户提供的作文题目
+    # topic = data.get('topic')
+    # if not topic:
+    #     return jsonify({'error': 'Missing topic parameter'}), 400
 
     # 获取当前段落的分析
     analysis = data.get('analysis')
@@ -522,20 +539,23 @@ def optimize():
 
     user_id = user.id
 
+    total_input = "我的段落分析是{}, 我的作文段落是{}".format(analysis, paragraph)
+
     # total_content = optimize_promote.format(topic, analysis, paragraph, get_user_message_max_chat_num(user_id) + 1)
-    total_content = optimize_promote.format(topic, analysis, paragraph, 1)
+    # total_content = optimize_promote.format(topic, analysis, paragraph, 1)
 
     try:
         # 调用DeepSeek API进行优化
-        response = Generation.call(
-            model='qwen-turbo',
-            messages=[
-                {
-                    'role': 'system',
-                    'content': total_content
-                }
-            ]
-        )
+        response = call_generation_api("qwen-turbo", optimize_promote, total_input)
+        # response = Generation.call(
+        #     model='qwen-turbo',
+        #     messages=[
+        #         {
+        #             'role': 'system',
+        #             'content': total_content
+        #         }
+        #     ]
+        # )
 
         # TODO: delete
         # 保存优化结果到数据库
@@ -543,19 +563,7 @@ def optimize():
 
         print("optimize api response: ", response)
 
-        return jsonify({
-            'status_code': response.status_code,
-            'request_id': response.request_id,
-            'error_code': response.code if response.code else '',
-            'usage': {
-                'input_tokens': response.usage.input_tokens,
-                'output_tokens': response.usage.output_tokens,
-                'total_tokens': response.usage.total_tokens
-            },
-            'output': {
-                'text': response.output.text
-            }
-        })
+        return build_response(response)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
