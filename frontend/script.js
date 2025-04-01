@@ -145,7 +145,7 @@ function initOptimize() {
 
       try {
         // 调用优化接口
-        const response = await fetch('https://14.103.174.219:5000/optimize', {
+        const response = await fetch('http://14.103.174.219:5000/optimize', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -244,7 +244,7 @@ document.getElementById('submit-btn').addEventListener('click', async () => {
 
 // 请求题目解析接口
 async function requestInitialization(input, resultElement) {
-    const response = await fetch('https://14.103.174.219:5000/initialization', {
+    const response = await fetch('http://14.103.174.219:5000/initialization', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({
@@ -305,7 +305,7 @@ async function requestAnalyze(input, resultElement, showUserMessage = true) {
     }
 
     try {
-        const response = await fetch('https://14.103.174.219:5000/analyze', {
+        const response = await fetch('http://14.103.174.219:5000/analyze', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({
@@ -404,7 +404,7 @@ document.getElementById('generate-final-outline-btn').addEventListener('click', 
         const user_name = 'current_user'; // 这里应该从登录状态获取实际用户名
         
         // 调用/outline接口
-        const response = await fetch('https://14.103.174.219:5000/outline', {
+        const response = await fetch('http://14.103.174.219:5000/outline', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
